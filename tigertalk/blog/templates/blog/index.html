@@ -1,0 +1,32 @@
+<h1>TigerTalk</h1>
+
+<h3>Questions</h3>
+
+<form action="{% url 'update' %}" method="post">
+{% csrf_token %}
+Question text = <input type="text" name="question" value="" />
+<input type="submit" value="Submit">
+</form>
+
+{% if latest_question_list %}
+    <ul>
+    {% for question in latest_question_list %}
+        <li>{{ question.text }}</li>
+        {% if question in expanded_question_list %}
+        	<ul>
+        	{% for answer in question.answers.all %}
+        		<li>{{answer.text}}</li>
+        	{% empty %}
+        		No answers, lol, sorry.
+        	{% endfor %}
+        	</ul>
+        {% else %}
+			<form action="{% url 'index' %}" method="get">
+				<button name="responses_requested" value="{{question.id}}">See responses</button>
+			</form>
+		{% endif %}
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No posts are available.</p>
+{% endif %}

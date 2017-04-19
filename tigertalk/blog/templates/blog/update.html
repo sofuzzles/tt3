@@ -1,0 +1,11 @@
+<h1>TigerTalk</h1>
+
+<h3>Questions</h3>
+
+{% if q %}
+    <ul>
+    	<li>{{ q.text }}</li>
+    </ul>
+{% else %}
+    <p>No posts are available.</p>
+{% endif %}
