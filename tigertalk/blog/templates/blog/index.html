@@ -2,7 +2,7 @@
 
 <h3>Questions</h3>
 
-<form action="{% url 'update' %}" method="post">
+<form action="{% url 'blog:update' %}" method="post">
 {% csrf_token %}
 Question text = <input type="text" name="question" value="" />
 <input type="submit" value="Submit">
@@ -21,7 +21,7 @@ Question text = <input type="text" name="question" value="" />
         	{% endfor %}
         	</ul>
         {% else %}
-			<form action="{% url 'index' %}" method="get">
+			<form action="{% url 'blog:index' %}" method="get">
 				<button name="responses_requested" value="{{question.id}}">See responses</button>
 			</form>
 		{% endif %}
