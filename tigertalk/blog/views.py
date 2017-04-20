@@ -15,18 +15,32 @@ def index(request):
 	except (KeyError, Question.DoesNotExist):
 		expanded_question_list = []
 	
+	try:
+		res_question = Question.objects.get(pk=request.GET['respond_to_q'])
+		response_question_list = [res_question]
+	except (KeyError, Question.DoesNotExist):
+		response_question_list = []
+	
+	try:
+		close_q = Question.objects.get(pk = request.GET['close_requested'])
+		expanded_question_list = []
+	except:
+		pass
+	
 	template = loader.get_template('blog/index.html')
 	context = {
 		'latest_question_list' : latest_question_list,
 		'expanded_question_list' : expanded_question_list, 
+		'response_question_list' : response_question_list, 
 	}
 	return HttpResponse(template.render(context, request))
 	
-def update(request):
-	q = request.POST['question']
+def update_responses(request):
+	a = request.POST['response']
+	q = request.POST['question_id']
 	anon_user = User.objects.all()[0]
-	question = Question(text=q, user=anon_user, created_at=timezone.now())
-	question.save()
+	answer = Answer(text=a, user=anon_user, created_at=timezone.now(), question=Question.objects.get(pk=q))
+	answer.save()
 	
 	return HttpResponseRedirect(reverse("blog:index"))
 
@@ -56,7 +70,7 @@ def answer(request, question_id):
 		    # If page is out of range (e.g. 9999), deliver last page of results.
 		    answers = paginator.page(paginator.num_pages)
 	    return render(request, 'blog/answer.html', {'question': question, 'answers': answers})
-    return render(request, 'blog/answer.html', {'question': question})
+    return render(request, 'blog/answer.html', {'question': Question.objects.get(pk=question_id)})
 
 
 def getq(request, question_id):
@@ -98,3 +112,28 @@ def addq(request):
 
         return HttpResponseRedirect('/')
     return HttpResponse(template.render(context))
+
+def postaq(request):
+	if request.method == 'GET':
+		return render(request, 'blog/postaq.html', {})
+	else:
+		q = request.POST['question']
+		t = request.POST['tags'].split()
+		
+		anon_user = User.objects.all()[0]
+		question = Question(text=q, user=anon_user, created_at=timezone.now())
+		question.save()
+		
+		for tag in t:
+			try:
+				t_obj = tag.objects.filter(text = tag)[0]
+			except:
+				t_obj = Tag(text = tag)
+				t_obj.save();
+			question.tags.add(t_obj)	
+	
+		return HttpResponseRedirect(reverse("blog:index"))
+	
+	
+	
+	

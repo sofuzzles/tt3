@@ -1,0 +1,11 @@
+<h1>Post Your Question</h1>
+
+
+<form method="post" action="{% url 'blog:postaq' %}">
+  {% csrf_token %}
+  Ask your Question:<br>
+  <textarea type="text" name="question" rows="7" style="width:100%" placeholder="Enter your Question....."></textarea>
+  Tag your question so others can find it!<br>
+  <input type="text" name="tags" placeholder="#COS #Kernighan" value=""> <br><br>
+  <input type="submit" value="Submit">
+</form>
