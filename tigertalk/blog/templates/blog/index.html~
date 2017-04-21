@@ -2,16 +2,18 @@
 
 <h3>Questions</h3>
 
-<form action="{% url 'blog:update' %}" method="post">
-{% csrf_token %}
-Question text = <input type="text" name="question" value="" />
-<input type="submit" value="Submit">
-</form>
+<a href="{% url 'blog:postaq' %}">Post a question, you curious cat</a> 
 
 {% if latest_question_list %}
     <ul>
     {% for question in latest_question_list %}
-        <li>{{ question.text }}</li>
+        <li>{{ question.text }}</li> <br>
+        {% for tag in question.tags.all %}
+        	<ul>
+        		<li>Tag: {{tag.text}}</li>
+        	</ul>
+        {% endfor %}
+        <br>
         {% if question in expanded_question_list %}
         	<ul>
         	{% for answer in question.answers.all %}
@@ -20,9 +22,28 @@ Question text = <input type="text" name="question" value="" />
         		No answers, lol, sorry.
         	{% endfor %}
         	</ul>
+        	<form action="{% url 'blog:index' %}" method="get">
+				<button name="close_requested" value="{{question.id}}">Close response(s)</button>
+			</form>
         {% else %}
-			<form action="{% url 'index' %}" method="get">
-				<button name="responses_requested" value="{{question.id}}">See responses</button>
+			<form action="{% url 'blog:index' %}" method="get">
+				<button name="responses_requested" value="{{question.id}}">See response(s)</button>
+			</form>
+		{% endif %}
+		{% if question in response_question_list %}
+			{% if user.is_authenticated %}
+			<form method="post" action="{% url 'blog:update_responses' %}">
+  			  {% csrf_token %}
+  				<textarea type="text" name="response" rows="7" style="width:100%" placeholder="Enter your response..."></textarea>
+  				<input type="hidden" name="question_id" value="{{question.id}}">
+  				<input type="submit" value="Submit">
+			</form>
+			{% else %}
+			<small><a href="/accounts/login">Please Login to Answer a Question</a></small>
+			{% endif %}
+		{% else %}
+			<form action="{% url 'blog:index' %}" method="get">
+				<button name="respond_to_q" value="{{question.id}}">Submit a Response</button>
 			</form>
 		{% endif %}
     {% endfor %}

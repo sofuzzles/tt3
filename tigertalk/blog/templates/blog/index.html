@@ -31,12 +31,17 @@
 			</form>
 		{% endif %}
 		{% if question in response_question_list %}
+			{% if user.is_authenticated %}
 			<form method="post" action="{% url 'blog:update_responses' %}">
-  				{% csrf_token %}
+  			  {% csrf_token %}
   				<textarea type="text" name="response" rows="7" style="width:100%" placeholder="Enter your response..."></textarea>
   				<input type="hidden" name="question_id" value="{{question.id}}">
   				<input type="submit" value="Submit">
+				<input type="hidden" name="user_id" value="{{user.id}}">
 			</form>
+			{% else %}
+			<small><a href="/accounts/login">Please Login to Answer a Question</a></small>
+			{% endif %}
 		{% else %}
 			<form action="{% url 'blog:index' %}" method="get">
 				<button name="respond_to_q" value="{{question.id}}">Submit a Response</button>

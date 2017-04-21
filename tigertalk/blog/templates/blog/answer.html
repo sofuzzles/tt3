@@ -7,6 +7,7 @@
 <h4>Answering Question : {{ question.text }}</h4>
 {% endif %}
 
+{% if user.is_authenticated %}
 <form id="answer" method="post" action="/answer/">
   {% csrf_token %}
   <textarea id="ans" rows="7" style="width:100%" placeholder="Enter your Answer....." type="text" name="answer"></textarea>
@@ -15,4 +16,7 @@
   <input type="hidden" value="{{ user.id }}" name="user" />
   <input class="btn btn-success" type="submit" value="Submit Answer" />
 </form>
+{% else %}
+<small><a href="/accounts/login/">Please Login to Answer a Question!</a></small>
+{% endif %}
 </div>
