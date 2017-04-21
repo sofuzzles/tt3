@@ -69,11 +69,20 @@ def index(request):
 	}
 	return HttpResponse(template.render(context, request))
 	
+def blocked(request):
+	template = loader.get_template('blog/blocked.html')
+	context = {}
+	return HttpResponse(template.render(context, request))	
+
+
 def update_responses(request):
 #	if request.user.is_anonymous():
 #		return HttpResponseRedirect("/accounts/login/")
 	a = request.POST['response']
 	q = request.POST['question_id']
+	if request.user.profile.blockedOrNot:
+		return HttpResponseRedirect(reverse('blog:blocked'))
+	
 	#user_id = request.POST['user_id']
 	#userobj = User.objects.get(id=user_id)
 	#netidtxt = request.user.username
