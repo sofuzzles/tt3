@@ -20,7 +20,6 @@ Filter by tag:
 
 {% for question in questions %}
 <div id="resp_results{{question.id}}">
-<div id="respond_results{{question.id}}">
         <li>{{ question.text }}</li> <br>
         {% if user.is_authenticated %}
             {% if question in flagged_question_list %}
@@ -40,7 +39,7 @@ Filter by tag:
         <br>
         {% if question in expanded_question_list %}
         	<ul>
-        	{% for answer in question.answers.all %}
+        	{% for answer in exp_answers %}
         		<li>{{answer.text}} -{{answer.user.profile.handle}}</li>
         	{% empty %}
         		No answers, lol, sorry.
@@ -57,7 +56,7 @@ Filter by tag:
 		{% endif %}
 		{% if question in response_question_list %}
 			{% if user.is_authenticated %}
-			<form method="post" action="{% url 'blog:update_responses' %}#respond_results{{question.id}}">
+			<form method="post" action="{% url 'blog:update_responses' %}#resp_results{{question.id}}">
   			  {% csrf_token %}
   				<textarea type="text" name="response" rows="7" style="width:100%" placeholder="Enter your response..."></textarea>
   				<input type="hidden" name="question_id" value="{{question.id}}">
@@ -74,7 +73,6 @@ Filter by tag:
 				<button name="respond_to_q" value="{{question.id}}">Submit a Response</button>
 			</form>
 		{% endif %}
-</div>
 </div>
 {% endfor %}
 

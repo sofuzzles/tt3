@@ -39,7 +39,7 @@ Filter by tag:
         <br>
         {% if question in expanded_question_list %}
         	<ul>
-        	{% for answer in question.answers.all %}
+        	{% for answer in expanded_answers %}
         		<li>{{answer.text}} -{{answer.user.profile.handle}}</li>
         	{% empty %}
         		No answers, lol, sorry.
