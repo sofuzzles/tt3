@@ -14,4 +14,6 @@ urlpatterns = [
     url(r'^(?P<question_id>[0-9]+)/answer/$', views.answer, name='post_answer'),
     url(r'postaquestion/', views.postaq, name='postaq'),
     url(r'createprofile/', views.createprofile, name='createprofile'),
+    url(r'filter/', views.filter, name='filter'),
+    url(r'loginpage/', views.loginpage, name='loginpage'),
 ]

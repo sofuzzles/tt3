@@ -2,7 +2,13 @@
 
 <h3>Questions</h3>
 
-<a href="{% url 'blog:postaq' %}">Post a question, you curious cat</a> 
+<a href="{% url 'blog:postaq' %}">Post a question, you curious cat</a>
+<br><br>
+Filter by tag: 
+<form action="{% url 'blog:filter' %}" method="get">
+	<input type="text" name="tags" placeholder="#COS #Kintali" value="">
+  	<input type="submit" value="Submit">
+</form> 
 
 {% if latest_question_list %}
     <ul>

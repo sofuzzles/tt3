@@ -2,7 +2,7 @@
 from django.db import models
  
  
-class ProfileManager(models.Manager):
+class UserManager(models.Manager):
     pass
 
 class QuestionManager(models.Manager):
@@ -13,4 +13,3 @@ class AnswerManager(models.Manager):
     
 class TagManager(models.Manager):
 	pass
-

@@ -3,11 +3,11 @@
 <h3>Welcome to the pack! Enter the information below so you can start answering and voting on answers: </h3>
 
 <form method="post" action="{% url 'blog:createprofile' %}">
-
 Username (this will appear instead of your netID): <br>
 <input type="text" name="handle"> <br>
-Class Year (ex: 2017, G2017):<br>
+Class Year (ex: 2017, G2017):
 <input type="text" name="year"> <br>
+<input type="hidden" name="user" value="{{user}}">
 <input type="submit" value="Submit">
 
 </form>

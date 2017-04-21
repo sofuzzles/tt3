@@ -2,7 +2,13 @@
 
 <h3>Questions</h3>
 
-<a href="{% url 'blog:postaq' %}">Post a question, you curious cat</a> 
+<a href="{% url 'blog:postaq' %}">Post a question, you curious cat</a>
+<br><br>
+Filter by tag: 
+<form action="{% url 'blog:filter' %} method="get">
+	<input type="text" name="tags" placeholder="#COS #Kintali" value="">
+  	<input type="submit" value="Submit">
+</form> 
 
 {% if latest_question_list %}
     <ul>
@@ -43,7 +49,6 @@
 			<form action="{% url 'blog:loginpage' %}" method="get">
                                 <button name="login" value="{{question.id}}">Please Login to Answer a Question</button>
                         </form>
-			<small><a href="/accounts/login">Please Login to Answer a Question</a></small>
 			{% endif %}
 		{% else %}
 			<form action="{% url 'blog:index' %}" method="get">

@@ -5,8 +5,9 @@ from django.utils import timezone
 from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
-from .models import Question, Tag, User, Answer
+from .models import Question, Tag, Profile, Answer
 
 def index(request):
 	latest_question_list = Question.objects.order_by('-created_at')[:5]
@@ -33,6 +34,7 @@ def index(request):
 		'latest_question_list' : latest_question_list,
 		'expanded_question_list' : expanded_question_list, 
 		'response_question_list' : response_question_list, 
+		'user': request.user,
 	}
 	return HttpResponse(template.render(context, request))
 	
@@ -41,21 +43,43 @@ def update_responses(request):
 #		return HttpResponseRedirect("/accounts/login/")
 	a = request.POST['response']
 	q = request.POST['question_id']
-	user_id = request.POST['user_id']
-	userobj = User.objects.get(id=user_id)
-	netidtxt = userobj.username
-	try:
-		prof = Profile.objects.get(netid=netidtxt)
-	except:
-		
+	#user_id = request.POST['user_id']
+	#userobj = User.objects.get(id=user_id)
+	#netidtxt = request.user.username
+      		
 	# prof.save()
 	#anon_user = User.objects.all()[0]
 	
-	answer = Answer(text=a, user=userobj, created_at=timezone.now(), question=Question.objects.get(pk=q))
+	answer = Answer(text=a, user=request.user, created_at=timezone.now(), question=Question.objects.get(pk=q))
 	answer.save()
 	
 	return HttpResponseRedirect(reverse("blog:index"))
 
+def filter(request):
+	search_tags = request.GET['tags'].split()
+	latest_question_list = Question.objects.order_by('-created_at')
+	allowed_question_list = []
+	for q in latest_question_list:
+		allowed = True
+		for t in search_tags:
+			if not q.tags.filter(text__iregex = t):
+				allowed = False
+				break
+		
+		if allowed:
+			allowed_question_list.append(q)
+	
+	allowed_question_list = allowed_question_list[:5]
+	print(search_tags)
+	print(allowed_question_list)
+	template = loader.get_template('blog/index.html')
+	context = {
+		'latest_question_list' : allowed_question_list,
+		'expanded_question_list' : [], 
+		'response_question_list' : [], 
+	}
+	return HttpResponse(template.render(context, request))
+		
 def answer(request, question_id):
     if request.user.is_anonymous():
 	    return HttpResponseRedirect("/accounts/login/")
@@ -120,5 +144,37 @@ def postaq(request):
 	
 	
 def createprofile(request):
-	
-	
+	if request.method == 'POST':
+		user = request.user
+		netidtxt = user.username
+		profile = Profile(handle=request.POST['handle'], classYear=request.POST['year'], user=user,initialized=True, netid=netidtxt, created_at=timezone.now())
+		profile.save()
+		#profile.handle = request.POST['handle']
+		#profile.classYear = request.POST['year']
+		#profile.initiated = True
+		#profile.netid = netidtxt
+		#profile.created_at = timezone.now()
+		#profile.user = user
+		#profile.save()
+		user.profile = profile
+		user.profile.save()
+		user.save()
+		#user.profile.handle = request.POST['handle']
+		#user.profile.classYear  = request.POST['year']
+		#user.profile.initiated = True
+		#user.profile.netid = netidtxt
+		#user.profile.created_at = timezone.now()
+		#user.profile.save()
+		#user.save()
+
+		return HttpResponseRedirect(reverse("blog:index"))
+
+	return render(request, 'blog/createprofile.html', {})
+    
+
+def loginpage(request):
+	context = {
+		'user': request.user,
+		}
+	template = loader.get_template("blog/loginpage.html")
+	return HttpResponse(template.render(context, request))

@@ -1,2 +1,18 @@
+{% if user.is_authenticated %}
+{% if user.profile.initialized %}
 
-<small><a href="/accounts/login">Please Login to Answer a Question</a></small>
+<h1> Thanks for Logging in! </h1>
+<form action="{% url 'blog:index' %}" method="get">                                                             
+       <button name="home" value="">Return to Home Page</button>              
+</form>
+{% else %}
+
+<h1> First time logging in? </h1>
+<form action="{% url 'blog:createprofile' %}" method="get">
+       <button name="home" value="">Please create your profile</button>
+</form>
+
+{% endif %}
+{% else %}
+<a href="/accounts/login">Log in!</a>
+{% endif %}
