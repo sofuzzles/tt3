@@ -18,8 +18,10 @@ def index(request):
 	try:
 		exp_question = Question.objects.get(pk=request.GET['responses_requested'])
 		expanded_question_list = [exp_question]
+		exp_answers = expanded_question_list[0].answers.order_by('helpfulCount', '-created_at')[:5]
 	except (KeyError, Question.DoesNotExist):
 		expanded_question_list = []
+		exp_answers = []
 	try:
 		res_question = Question.objects.get(pk=request.GET['respond_to_q'])
 		response_question_list = [res_question]
@@ -28,6 +30,7 @@ def index(request):
 	try: 
 		close_q = Question.objects.get(pk=request.GET['close_requested'])
 		expanded_question_list= []
+		exp_answers = []
 	except:
 		pass
 
@@ -66,6 +69,7 @@ def index(request):
 		'response_question_list' : response_question_list, 
 		'user': request.user,
 		'flagged_question_list': flagged_question_list,
+		'expanded_answers': exp_answers,
 	}
 	return HttpResponse(template.render(context, request))
 	

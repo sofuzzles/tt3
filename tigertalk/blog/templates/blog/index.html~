@@ -19,34 +19,44 @@ Filter by tag:
 </form> 
 
 {% for question in questions %}
+<div id="resp_results{{question.id}}">
         <li>{{ question.text }}</li> <br>
+        {% if user.is_authenticated %}
+            {% if question in flagged_question_list %}
+                You have flagged this question <br>
+            {% else %}
+                <form action="{% url 'blog:index' %}" method="get">
+                        <button name="flag_q" value="{{question.id}}">Flag this question as inappropriate</button>
+                        <input type="hidden" name="user_id" value="{{user.id}}">
+                </form>
+            {% endif %}
+        {% endif %}
         {% for tag in question.tags.all %}
         	<ul>
         		<li>Tag: {{tag.text}}</li>
         	</ul>
         {% endfor %}
         <br>
-	<div id="resp_results">
         {% if question in expanded_question_list %}
         	<ul>
-        	{% for answer in question.answers.all %}
+        	{% for answer in exp_answers %}
         		<li>{{answer.text}} -{{answer.user.profile.handle}}</li>
         	{% empty %}
         		No answers, lol, sorry.
         	{% endfor %}
         	</ul>
-	</div>	
-        	<form action="{% url 'blog:index' %}#close_results" method="get">
+	
+        	<form action="{% url 'blog:index' %}#resp_results{{question.id}}" method="get">
 				<button name="close_requested" value="{{question.id}}">Close response(s)</button>
 			</form>
         {% else %}
-			<form action="{% url 'blog:index' %}#resp_results" method="get">
+			<form action="{% url 'blog:index' %}#resp_results{{question.id}}" method="get">
 				<button name="responses_requested" value="{{question.id}}">See response(s)</button>
 			</form>
 		{% endif %}
 		{% if question in response_question_list %}
 			{% if user.is_authenticated %}
-			<form method="post" action="{% url 'blog:update_responses' %}">
+			<form method="post" action="{% url 'blog:update_responses' %}#resp_results{{question.id}}">
   			  {% csrf_token %}
   				<textarea type="text" name="response" rows="7" style="width:100%" placeholder="Enter your response..."></textarea>
   				<input type="hidden" name="question_id" value="{{question.id}}">
@@ -63,6 +73,7 @@ Filter by tag:
 				<button name="respond_to_q" value="{{question.id}}">Submit a Response</button>
 			</form>
 		{% endif %}
+</div>
 {% endfor %}
 
 <div class="pagination">
