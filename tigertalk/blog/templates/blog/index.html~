@@ -20,14 +20,24 @@ Filter by tag:
 
 {% for question in questions %}
         <li>{{ question.text }}</li> <br>
+        {% if user.is_authenticated %}
+            {% if question in flagged_question_list %}
+                You have flagged this question <br>
+            {% else %}
+                <form action="{% url 'blog:index' %}" method="get">
+                        <button name="flag_q" value="{{question.id}}">Flag this question as inappropriate</button>
+                        <input type="hidden" name="user_id" value="{{user.id}}">
+                </form>
+            {% endif %}
+        {% endif %}
         {% for tag in question.tags.all %}
         	<ul>
         		<li>Tag: {{tag.text}}</li>
         	</ul>
         {% endfor %}
         <br>
-	<div id="resp_results">
         {% if question in expanded_question_list %}
+	        <div id="resp_results">
         	<ul>
         	{% for answer in question.answers.all %}
         		<li>{{answer.text}} -{{answer.user.profile.handle}}</li>
@@ -35,8 +45,8 @@ Filter by tag:
         		No answers, lol, sorry.
         	{% endfor %}
         	</ul>
-	</div>	
-        	<form action="{% url 'blog:index' %}#close_results" method="get">
+		</div>
+        	<form action="{% url 'blog:index' %}#resp_results" method="get">
 				<button name="close_requested" value="{{question.id}}">Close response(s)</button>
 			</form>
         {% else %}
@@ -46,12 +56,14 @@ Filter by tag:
 		{% endif %}
 		{% if question in response_question_list %}
 			{% if user.is_authenticated %}
-			<form method="post" action="{% url 'blog:update_responses' %}">
+			<form method="post" action="{% url 'blog:update_responses' %}respond_results">
   			  {% csrf_token %}
+			  <div id="respond_results">
   				<textarea type="text" name="response" rows="7" style="width:100%" placeholder="Enter your response..."></textarea>
   				<input type="hidden" name="question_id" value="{{question.id}}">
   				<input type="submit" value="Submit">
 				<input type="hidden" name="user_id" value="{{user.id}}">
+			</div>
 			</form>
 			{% else %}
 			<form action="{% url 'blog:loginpage' %}" method="get">

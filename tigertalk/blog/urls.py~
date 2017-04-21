@@ -15,4 +15,5 @@ urlpatterns = [
     url(r'postaquestion/', views.postaq, name='postaq'),
     url(r'createprofile/', views.createprofile, name='createprofile'),
     url(r'filter/', views.filter, name='filter'),
+    url(r'loginpage/', views.loginpage, name='loginpage'),
 ]

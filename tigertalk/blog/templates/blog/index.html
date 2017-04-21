@@ -36,8 +36,8 @@ Filter by tag:
         	</ul>
         {% endfor %}
         <br>
-	<div id="resp_results">
         {% if question in expanded_question_list %}
+	        <div id="resp_results">
         	<ul>
         	{% for answer in question.answers.all %}
         		<li>{{answer.text}} -{{answer.user.profile.handle}}</li>
@@ -45,7 +45,7 @@ Filter by tag:
         		No answers, lol, sorry.
         	{% endfor %}
         	</ul>
-	</div>	
+		</div>
         	<form action="{% url 'blog:index' %}#resp_results" method="get">
 				<button name="close_requested" value="{{question.id}}">Close response(s)</button>
 			</form>
@@ -56,7 +56,7 @@ Filter by tag:
 		{% endif %}
 		{% if question in response_question_list %}
 			{% if user.is_authenticated %}
-			<form method="post" action="{% url 'blog:update_responses' %}">
+			<form method="post" action="{% url 'blog:update_responses' %}respond_results">
   			  {% csrf_token %}
   				<textarea type="text" name="response" rows="7" style="width:100%" placeholder="Enter your response..."></textarea>
   				<input type="hidden" name="question_id" value="{{question.id}}">
