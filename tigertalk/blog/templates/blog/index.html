@@ -1,8 +1,12 @@
 <h1>TigerTalk</h1>
 
-<form action="{% url 'blog:loginpage' %}" method="get">
-        <button name="login" value="{{question.id}}">Click here to Log-in/Register</button>
-</form>
+{% if user.is_authenticated %}
+    <a href="/accounts/logout">Log out</a>
+{% else %}
+    <form action="{% url 'blog:loginpage' %}" method="get">
+            <button name="login" value="{{question.id}}">Click here to Log-in/Register</button>
+    </form>
+{% endif %}
 
 <h3>Questions</h3>
 
