@@ -20,7 +20,7 @@ Filter by tag:
 
 {% for question in questions %}
         <li>{{ question.text }}</li> <br>
-        {% if user.is_authenticated %}
+        {% if user.is_authenticated and not user.profile.blockedOrNot %}
             {% if question in flagged_question_list %}
                 You have flagged this question <br>
             {% else %}
@@ -55,7 +55,7 @@ Filter by tag:
 			</form>
 		{% endif %}
 		{% if question in response_question_list %}
-			{% if user.is_authenticated %}
+			{% if user.is_authenticated and not user.profile.blockedOrNot %}
 			<form method="post" action="{% url 'blog:update_responses' %}">
   			  {% csrf_token %}
   				<textarea type="text" name="response" rows="7" style="width:100%" placeholder="Enter your response..."></textarea>
