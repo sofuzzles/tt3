@@ -4,9 +4,11 @@ from django.template import loader, RequestContext
 from django.utils import timezone
 from django.urls import reverse
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
 
 from .models import Question, Tag, User, Answer
 
+@login_required
 def index(request):
 	latest_question_list = Question.objects.order_by('-created_at')[:5]
 	try:

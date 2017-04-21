@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog.apps.BlogConfig',
+    'django_cas_ng',
 ]
 
 MIDDLEWARE = [
@@ -50,7 +51,18 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+MIDDLEWARE_CLASSES = [
+    'django_cas_ng.middleware.CASMiddleware',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'django_cas_ng.backends.CASBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 ROOT_URLCONF = 'tigertalk.urls'
+
+CAS_SERVER_URL = 'https://fed.princeton.edu/cas/'
 
 TEMPLATES = [
     {
