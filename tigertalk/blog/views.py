@@ -8,7 +8,6 @@ from django.contrib.auth.decorators import login_required
 
 from .models import Question, Tag, User, Answer
 
-@login_required
 def index(request):
 	latest_question_list = Question.objects.order_by('-created_at')[:5]
 	try:
@@ -38,10 +37,17 @@ def index(request):
 	return HttpResponse(template.render(context, request))
 	
 def update_responses(request):
+	if request.user.is_anonymous():
+		return HttpResponseRedirect("/accounts/login/")
 	a = request.POST['response']
 	q = request.POST['question_id']
-	anon_user = User.objects.all()[0]
-	answer = Answer(text=a, user=anon_user, created_at=timezone.now(), question=Question.objects.get(pk=q))
+	user_id = request.POST['user_id']
+	userobj = User.objects.get(id=user_id)
+	# prof = Profile.objects.get(user=userobj)
+	# prof.save()
+	#anon_user = User.objects.all()[0]
+	
+	answer = Answer(text=a, user=userobj, created_at=timezone.now(), question=Question.objects.get(pk=q))
 	answer.save()
 	
 	return HttpResponseRedirect(reverse("blog:index"))
@@ -72,18 +78,23 @@ def filter(request):
 	return HttpResponse(template.render(context, request))
 		
 def answer(request, question_id):
+    if request.user.is_anonymous():
+	    return HttpResponseRedirect("/accounts/login/")
     if request.method == 'POST':
 	    context = RequestContext(request)
 	    answer_text = request.POST['answer']
 	    question_id = request.POST['question']
 	    q = Question.objects.get(pk=question_id)
     
-	    anon_user = User.objects.all()[0]
+	    user_id = request.POST['user']
+	    user = User.objects.get(id=user_id)
+	    prof = Profile.objects.get(user=user)
+	    prof.save()
 	    if answer_text.strip() == '':
 		    return render(request, 'blog/answer.html', {'message': 'Empty'})
     
 	    answer_created = timezone.now()
-	    answer = Answer(text = answer_text, user=anon_user, question = q, created_at=answer_created)
+	    answer = Answer(text = answer_text, profile=prof, question = q, created_at=answer_created)
 	    answer.save()
 	    answer_list = question.answer_set.order_by('-created_at')
 	    paginator = Paginator(answer_list, 10)
@@ -106,39 +117,6 @@ def getq(request, question_id):
     except Question.DoesNotExist:
         raise Http404("Question does not exist")
     return render(request, 'blog/getquestion.html', {'question': question})
-
-def addq(request):
-    template = loader.get_template('blog/add.html')
-    context = RequestContext(request)
-
-    if request.method == 'POST':
-        question_text = request.POST['question']
-        tag_text = request.POST['tag']
-        user_id = request.POST['user']
-        user_obj = User.objects.get(id=user_id)
-
-        if question_text.strip() == '':
-            return render(request, 'blog/add.html', {'message': 'Empty'})
-        question_created_at = datetime.timezone.now()
-        q = Question()
-        q.text = question_text
-        q.created_at = question_created_at
-        q.user = user_obj
-        q.save()
-
-        tags = tag_text.split(',')
-        for tag in tags:
-            try:
-                t = Tag.objects.get(id = tag_id)
-                q.tags.add(t)
-            except Tag.DoesNotExist:
-                t = Tag()
-                t.text = tag
-                t.save()
-                q.tags.add(t)
-
-        return HttpResponseRedirect('/')
-    return HttpResponse(template.render(context))
 
 def postaq(request):
 	if request.method == 'GET':
