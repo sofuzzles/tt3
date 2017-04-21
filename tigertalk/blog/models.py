@@ -53,7 +53,7 @@ class Question(models.Model):
         default=0,
         verbose_name= "Inappropriate")
     # Attributes - Optional
-    inappropriateId = models.ManyToManyField(User, related_name = '+')
+    inappropriateId = models.ManyToManyField(User, related_name = 'flagged_questions')
     # Object Manager
     objects = managers.QuestionManager()
     # Custom Properties

@@ -30,15 +30,34 @@ def index(request):
 		expanded_question_list= []
 	except:
 		pass
+
+	# questions the user flagged
+	try:
+		flagged_q = Question.objects.get(pk=request.GET['flag_q'])
+		user  = request.user
+		flagged_q.inappropriateCount += 1
+		flagged_q.inappropriateId.add(user)
+		flagged_q.save()
+
+		user.flagged_questions.add(flagged_q)
+		user.save()
+	except:
+		pass
+
+	# if user logged in, don't let them reflag question
+	try:
+		user  = request.user
+		flagged_question_list = user.flagged_questions.all()
+	except:
+		flagged_question_list = []
+
+
 	try:
 		questions = paginator.page(page)
 	except PageNotAnInteger:
 		questions = paginator.page(1)
 	except EmptyPage:
 		questions = paginator.page(paginator.num_pages)
-	#return render(request, 'index.html', {'questions': questions})
-
-	#latest_question_list = Question.objects.order_by('-created_at')[:5]
 	
 	template = loader.get_template('blog/index.html')
 	context = {
@@ -46,6 +65,7 @@ def index(request):
 		'expanded_question_list' : expanded_question_list, 
 		'response_question_list' : response_question_list, 
 		'user': request.user,
+		'flagged_question_list': flagged_question_list,
 	}
 	return HttpResponse(template.render(context, request))
 	
@@ -90,40 +110,6 @@ def filter(request):
 		'response_question_list' : [], 
 	}
 	return HttpResponse(template.render(context, request))
-		
-def answer(request, question_id):
-    if request.user.is_anonymous():
-	    return HttpResponseRedirect("/accounts/login/")
-    if request.method == 'POST':
-	    context = RequestContext(request)
-	    answer_text = request.POST['answer']
-	    question_id = request.POST['question']
-	    q = Question.objects.get(pk=question_id)
-    
-	    user_id = request.POST['user']
-	    user = User.objects.get(id=user_id)
-	    prof = Profile.objects.get(user=user)
-	    prof.save()
-	    if answer_text.strip() == '':
-		    return render(request, 'blog/answer.html', {'message': 'Empty'})
-    
-	    answer_created = timezone.now()
-	    answer = Answer(text = answer_text, profile=prof, question = q, created_at=answer_created)
-	    answer.save()
-	    answer_list = question.answer_set.order_by('-created_at')
-	    paginator = Paginator(answer_list, 10)
-	    page = request.GET.get('page')
-	    try:
-		    answers = paginator.page(page)
-	    except PageNotAnInteger:
-		    # If page is not an integer, deliver first page.
-		    answers = paginator.page(1)
-	    except EmptyPage:
-		    # If page is out of range (e.g. 9999), deliver last page of results.
-		    answers = paginator.page(paginator.num_pages)
-	    return render(request, 'blog/answer.html', {'question': question, 'answers': answers})
-    return render(request, 'blog/answer.html', {'question': Question.objects.get(pk=question_id)})
-
 
 def getq(request, question_id):
     try:
