@@ -18,9 +18,7 @@ Filter by tag:
   	<input type="submit" value="Submit">
 </form> 
 
-{% if latest_question_list %}
-    <ul>
-    {% for question in latest_question_list %}
+{% for question in questions %}
         <li>{{ question.text }}</li> <br>
         {% for tag in question.tags.all %}
         	<ul>
@@ -63,8 +61,20 @@ Filter by tag:
 				<button name="respond_to_q" value="{{question.id}}">Submit a Response</button>
 			</form>
 		{% endif %}
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No posts are available.</p>
-{% endif %}
+{% endfor %}
+
+<div class="pagination">
+  <span class="step-links">
+    {% if questions.has_previous %}
+       <a href="?page={{ questions.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ questions.number }} of {{ questions.paginator.num_pages }}.
+        </span>
+
+        {% if questions.has_next %}
+            <a href="?page={{ questions.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
