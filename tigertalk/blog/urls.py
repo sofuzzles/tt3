@@ -13,4 +13,5 @@ urlpatterns = [
     # ex: /polls/5/vote/                                                                   
     url(r'^(?P<question_id>[0-9]+)/answer/$', views.answer, name='post_answer'),
     url(r'postaquestion/', views.postaq, name='postaq'),
+    url(r'filter/', views.filter, name='filter'),
 ]

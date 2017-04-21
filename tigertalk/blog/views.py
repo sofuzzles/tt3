@@ -46,6 +46,31 @@ def update_responses(request):
 	
 	return HttpResponseRedirect(reverse("blog:index"))
 
+def filter(request):
+	search_tags = request.GET['tags'].split()
+	latest_question_list = Question.objects.order_by('-created_at')
+	allowed_question_list = []
+	for q in latest_question_list:
+		allowed = True
+		for t in search_tags:
+			if not q.tags.filter(text = t):
+				allowed = False
+				break
+		
+		if allowed:
+			allowed_question_list.append(q)
+	
+	allowed_question_list = allowed_question_list[:5]
+	print(search_tags)
+	print(allowed_question_list)
+	template = loader.get_template('blog/index.html')
+	context = {
+		'latest_question_list' : allowed_question_list,
+		'expanded_question_list' : [], 
+		'response_question_list' : [], 
+	}
+	return HttpResponse(template.render(context, request))
+		
 def answer(request, question_id):
     if request.method == 'POST':
 	    context = RequestContext(request)
