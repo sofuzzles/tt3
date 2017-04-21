@@ -1,5 +1,9 @@
 <h1>TigerTalk</h1>
 
+<form action="{% url 'blog:loginpage' %}" method="get">
+        <button name="login" value="{{question.id}}">Click here to Log-in/Register</button>
+</form>
+
 <h3>Questions</h3>
 
 <a href="{% url 'blog:postaq' %}">Post a question, you curious cat</a>
@@ -48,7 +52,7 @@ Filter by tag:
 			{% else %}
 			<form action="{% url 'blog:loginpage' %}" method="get">
                                 <button name="login" value="{{question.id}}">Please Login to Answer a Question</button>
-                        </form>
+            </form>
 			{% endif %}
 		{% else %}
 			<form action="{% url 'blog:index' %}" method="get">
