@@ -26,6 +26,7 @@ Filter by tag:
         	</ul>
         {% endfor %}
         <br>
+	<div id="resp_results">
         {% if question in expanded_question_list %}
         	<ul>
         	{% for answer in question.answers.all %}
@@ -34,11 +35,12 @@ Filter by tag:
         		No answers, lol, sorry.
         	{% endfor %}
         	</ul>
-        	<form action="{% url 'blog:index' %}" method="get">
+	</div>	
+        	<form action="{% url 'blog:index' %}#resp_results" method="get">
 				<button name="close_requested" value="{{question.id}}">Close response(s)</button>
 			</form>
         {% else %}
-			<form action="{% url 'blog:index' %}" method="get">
+			<form action="{% url 'blog:index' %}#resp_results" method="get">
 				<button name="responses_requested" value="{{question.id}}">See response(s)</button>
 			</form>
 		{% endif %}
