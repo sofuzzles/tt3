@@ -31,7 +31,7 @@ Filter by tag:
         {% if question in expanded_question_list %}
         	<ul>
         	{% for answer in question.answers.all %}
-        		<li>{{answer.text}}</li>
+        		<li>{{answer.text}} -{{answer.user.profile.handle}}</li>
         	{% empty %}
         		No answers, lol, sorry.
         	{% endfor %}
