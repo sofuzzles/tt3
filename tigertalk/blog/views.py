@@ -6,26 +6,28 @@ from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .models import Question, Tag, Profile, Answer
 
 def index(request):
-	latest_question_list = Question.objects.order_by('-created_at')[:5]
+	q_list = Question.objects.order_by('-created_at')
+	user = request.user
+	paginator = Paginator(q_list, 5)
+	page = request.GET.get('page')
 	try:
 		exp_question = Question.objects.get(pk=request.GET['responses_requested'])
 		expanded_question_list = [exp_question]
 	except (KeyError, Question.DoesNotExist):
 		expanded_question_list = []
-	
 	try:
 		res_question = Question.objects.get(pk=request.GET['respond_to_q'])
 		response_question_list = [res_question]
 	except (KeyError, Question.DoesNotExist):
 		response_question_list = []
-	
-	try:
-		close_q = Question.objects.get(pk = request.GET['close_requested'])
-		expanded_question_list = []
+	try: 
+		close_q = Question.objects.get(pk=request.GET['close_requested'])
+		expanded_question_list= []
 	except:
 		pass
 
@@ -48,10 +50,18 @@ def index(request):
 		flagged_question_list = user.flagged_questions.all()
 	except:
 		flagged_question_list = []
+
+
+	try:
+		questions = paginator.page(page)
+	except PageNotAnInteger:
+		questions = paginator.page(1)
+	except EmptyPage:
+		questions = paginator.page(paginator.num_pages)
 	
 	template = loader.get_template('blog/index.html')
 	context = {
-		'latest_question_list' : latest_question_list,
+		'questions' : questions,
 		'expanded_question_list' : expanded_question_list, 
 		'response_question_list' : response_question_list, 
 		'user': request.user,
