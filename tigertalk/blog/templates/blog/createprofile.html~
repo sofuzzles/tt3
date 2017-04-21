@@ -1,0 +1,12 @@
+<h1>Create your TigerTalk Profile</h1
+
+<h3>Welcome to the pack! Enter the information below so you can start answering and voting on answers: </h3>
+
+<form method="post" action="{% url 'blog:makeuser' %}">
+Username (this will appear instead of your netID): <br>
+<input type="text" name="username"> <br>
+Class Year (ex: 2017, G2017):
+<input type="text" name="year"> <br>
+<input type="submit" value="Submit">
+
+</form>

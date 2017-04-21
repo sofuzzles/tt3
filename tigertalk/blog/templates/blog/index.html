@@ -40,7 +40,9 @@
 				<input type="hidden" name="user_id" value="{{user.id}}">
 			</form>
 			{% else %}
-			<small><a href="/accounts/login">Please Login to Answer a Question</a></small>
+			<form action="{% url 'blog:loginpage' %}" method="get">
+                                <button name="login" value="{{question.id}}">Please Login to Answer a Question</button>
+                        </form>
 			{% endif %}
 		{% else %}
 			<form action="{% url 'blog:index' %}" method="get">
