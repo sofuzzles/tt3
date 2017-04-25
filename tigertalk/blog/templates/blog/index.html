@@ -17,8 +17,14 @@ Filter by tag:
 	<input type="text" name="tags" placeholder="#COS #Kintali" value="">
   	<input type="submit" value="Submit">
 </form> 
+ 
+
+{% load el_pagination_tags %}
+{% paginate questions starting from page cur_page %}
+
 
 {% for question in questions %}
+{% show_current_number as page_number %}
 <div id="resp_results{{question.id}}">
         <li>{{ question.text }}</li> <br>
         {% if user.is_authenticated and not user.profile.blockedOrNot %}
@@ -28,6 +34,7 @@ Filter by tag:
                 <form action="{% url 'blog:index' %}" method="get">
                         <button name="flag_q" value="{{question.id}}">Flag this question as inappropriate</button>
                         <input type="hidden" name="user_id" value="{{user.id}}">
+			 <input type="hidden" name="page" value="{{page_number}}">
                 </form>
             {% endif %}
         {% endif %}
@@ -48,9 +55,11 @@ Filter by tag:
 	
         	<form action="{% url 'blog:index' %}#resp_results{{question.id}}" method="get">
 				<button name="close_requested" value="{{question.id}}">Close response(s)</button>
+				<input type="hidden" name="page" value="{{page_number}}">
 			</form>
         {% else %}
 			<form action="{% url 'blog:index' %}#resp_results{{question.id}}" method="get">
+			        <input type="hidden" name="page" value="{{page_number}}">
 				<button name="responses_requested" value="{{question.id}}">See response(s)</button>
 			</form>
 		{% endif %}
@@ -62,6 +71,7 @@ Filter by tag:
   				<input type="hidden" name="question_id" value="{{question.id}}">
   				<input type="submit" value="Submit">
 				<input type="hidden" name="user_id" value="{{user.id}}">
+				 <input type="hidden" name="page" value="{{page_number}}">
 			</form>
 			{% else %}
 			<form action="{% url 'blog:loginpage' %}" method="get">
@@ -71,23 +81,10 @@ Filter by tag:
 		{% else %}
 			<form action="{% url 'blog:index' %}" method="get">
 				<button name="respond_to_q" value="{{question.id}}">Submit a Response</button>
+				 <input type="hidden" name="page" value="{{page_number}}">
 			</form>
 		{% endif %}
 </div>
 {% endfor %}
+{% show_pages %}
 
-<div class="pagination">
-  <span class="step-links">
-    {% if questions.has_previous %}
-       <a href="?page={{ questions.previous_page_number }}">previous</a>
-        {% endif %}
-
-        <span class="current">
-            Page {{ questions.number }} of {{ questions.paginator.num_pages }}.
-        </span>
-
-        {% if questions.has_next %}
-            <a href="?page={{ questions.next_page_number }}">next</a>
-        {% endif %}
-    </span>
-</div>

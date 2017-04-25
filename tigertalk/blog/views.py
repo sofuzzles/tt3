@@ -7,29 +7,36 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from el_pagination.views import AjaxListView
+from el_pagination import utils
 
 from .models import Question, Tag, Profile, Answer
 
 def index(request):
-	q_list = Question.objects.order_by('-created_at')
+	#q_list = Question.objects.order_by('-created_at')
+	questions = Question.objects.order_by('-created_at')
 	user = request.user
-	paginator = Paginator(q_list, 5)
-	page = request.GET.get('page')
+	#paginator = Paginator(q_list, 5)
+	#page = request.GET.get('page')
 	try:
 		exp_question = Question.objects.get(pk=request.GET['responses_requested'])
+		cur_page = request.GET['page']
 		expanded_question_list = [exp_question]
 		exp_answers = expanded_question_list[0].answers.order_by('helpfulCount', '-created_at')[:5]
 	except (KeyError, Question.DoesNotExist):
 		expanded_question_list = []
 		exp_answers = []
+		cur_page = utils.get_page_number_from_request(request)
 	try:
 		res_question = Question.objects.get(pk=request.GET['respond_to_q'])
+		cur_page = request.GET['page']
 		response_question_list = [res_question]
 	except (KeyError, Question.DoesNotExist):
 		response_question_list = []
 	try: 
 		close_q = Question.objects.get(pk=request.GET['close_requested'])
 		expanded_question_list= []
+		cur_page = request.GET['page']
 		exp_answers = []
 	except:
 		pass
@@ -41,7 +48,7 @@ def index(request):
 		flagged_q.inappropriateCount += 1
 		flagged_q.inappropriateId.add(user)
 		flagged_q.save()
-
+		cur_page = request.GET['page']
 		user.flagged_questions.add(flagged_q)
 		user.save()
 	except:
@@ -55,12 +62,12 @@ def index(request):
 		flagged_question_list = []
 
 
-	try:
-		questions = paginator.page(page)
-	except PageNotAnInteger:
-		questions = paginator.page(1)
-	except EmptyPage:
-		questions = paginator.page(paginator.num_pages)
+	#try:
+		#questions = paginator.page(page)
+	#except PageNotAnInteger:
+		#questions = paginator.page(1)
+	#except EmptyPage:
+		#questions = paginator.page(paginator.num_pages)
 	
 	template = loader.get_template('blog/index.html')
 	context = {
@@ -70,7 +77,13 @@ def index(request):
 		'user': request.user,
 		'flagged_question_list': flagged_question_list,
 		'expanded_answers': exp_answers,
+		'cur_page': cur_page,
+		#'page': page,
+		#'page_template': page_template,
 	}
+	print(cur_page)
+	#if request.is_ajax():
+		#template = page_template
 	return HttpResponse(template.render(context, request))
 	
 def blocked(request):

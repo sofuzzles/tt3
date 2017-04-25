@@ -17,11 +17,17 @@ Filter by tag:
 	<input type="text" name="tags" placeholder="#COS #Kintali" value="">
   	<input type="submit" value="Submit">
 </form> 
+ 
+
+{% load el_pagination_tags %}
+{% paginate questions starting from page cur_page %}
+
 
 {% for question in questions %}
+{% show_current_number as page_number %}
 <div id="resp_results{{question.id}}">
         <li>{{ question.text }}</li> <br>
-        {% if user.is_authenticated %}
+        {% if user.is_authenticated and not user.profile.blockedOrNot %}
             {% if question in flagged_question_list %}
                 You have flagged this question <br>
             {% else %}
@@ -39,7 +45,7 @@ Filter by tag:
         <br>
         {% if question in expanded_question_list %}
         	<ul>
-        	{% for answer in exp_answers %}
+        	{% for answer in expanded_answers %}
         		<li>{{answer.text}} -{{answer.user.profile.handle}}</li>
         	{% empty %}
         		No answers, lol, sorry.
@@ -51,11 +57,12 @@ Filter by tag:
 			</form>
         {% else %}
 			<form action="{% url 'blog:index' %}#resp_results{{question.id}}" method="get">
+			        <input type="hidden" name="page" value="{{page_number}}">
 				<button name="responses_requested" value="{{question.id}}">See response(s)</button>
 			</form>
 		{% endif %}
 		{% if question in response_question_list %}
-			{% if user.is_authenticated %}
+			{% if user.is_authenticated and not user.profile.blockedOrNot %}
 			<form method="post" action="{% url 'blog:update_responses' %}#resp_results{{question.id}}">
   			  {% csrf_token %}
   				<textarea type="text" name="response" rows="7" style="width:100%" placeholder="Enter your response..."></textarea>
@@ -75,19 +82,5 @@ Filter by tag:
 		{% endif %}
 </div>
 {% endfor %}
+{% show_pages %}
 
-<div class="pagination">
-  <span class="step-links">
-    {% if questions.has_previous %}
-       <a href="?page={{ questions.previous_page_number }}">previous</a>
-        {% endif %}
-
-        <span class="current">
-            Page {{ questions.number }} of {{ questions.paginator.num_pages }}.
-        </span>
-
-        {% if questions.has_next %}
-            <a href="?page={{ questions.next_page_number }}">next</a>
-        {% endif %}
-    </span>
-</div>
