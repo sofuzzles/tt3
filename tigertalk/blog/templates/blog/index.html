@@ -31,7 +31,7 @@ Filter by tag:
             {% if question in flagged_question_list %}
                 You have flagged this question <br>
             {% else %}
-                <form action="{% url 'blog:index' %}" method="get">
+                <form action="{% url 'blog:index' %}" method="post">
                         <button name="flag_q" value="{{question.id}}">Flag this question as inappropriate</button>
                         <input type="hidden" name="user_id" value="{{user.id}}">
 			 <input type="hidden" name="page" value="{{page_number}}">

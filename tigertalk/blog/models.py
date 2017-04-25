@@ -8,6 +8,7 @@ from django.dispatch import receiver
 from . import managers
 
 # Profile model
+# TODO: add inappropriate count
 class Profile(models.Model):
     # Relations
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -19,6 +20,7 @@ class Profile(models.Model):
     modOrNot = models.BooleanField(default = False)
     blockedOrNot = models.BooleanField(default = False)
     classYear = models.CharField(max_length = 10, blank=True)
+    inappropriateCount = models.PositiveIntegerField(default=0)
     # Attributes - Optional
     # Object Manager
     objects = managers.ProfileManager()
@@ -110,7 +112,7 @@ class Answer(models.Model):
 # Tag model
 class Tag(models.Model):
     # Relations
-    questions = models.ManyToManyField(Question, related_name = 'tags') # might want to change this for symmetry
+    questions = models.ManyToManyField(Question, related_name = 'tags') 
     
     # Attributes - Mandatory
     text = models.CharField(max_length = 30)
@@ -131,3 +133,25 @@ class Tag(models.Model):
         
     def __str__(self):
         return self.text
+
+# Blocked user list
+class Blocked(models.Model):
+	# Relations
+	user = models.OneToOneField(User, related_name = 'blocked_info')
+	
+	# Attributes - Mandatory
+	blocked_at = models.DateTimeField()
+	count = models.PositiveIntegerField()
+	# Attributes - Optional
+	# Object Manager
+	objects = managers.BlockedManager()
+	# Custom Properties      
+	# Methods	
+	# Meta and String
+	class Meta:
+	    verbose_name = "Blocked"
+	    verbose_name_plural = "Blockeds"
+	    ordering = ("count", "blocked_at",)
+        
+	def __str__(self):
+	    return self.user.profile.handle

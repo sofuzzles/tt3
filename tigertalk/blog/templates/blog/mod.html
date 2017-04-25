@@ -1,0 +1,35 @@
+{% if user.is_authenticated and user.profile.modOrNot %}
+	<h1> Moderator home page </h1>
+	<h3> Questions marked inappropriate: </h3> <br>
+	<ul>
+		{% for question in inappropriate_questions %}
+			<li> {{ question.text }} 
+					<form action="{% url 'blog:mod' %}" method="post">
+							{% csrf_token %}
+							<button name="delete_q" value="{{question.id}}"> Delete this question </button>
+							<input type="hidden" name="user_id" value="{{user.id}}">
+				  </form>
+			</li>
+		{% endfor %}
+	</ul>
+	<h3> Responses marked inappropriate: </h3> <br>
+	<ul>
+		{% for response in inappropriate_responses %}
+			<li> {{ response.text }} 
+					<form action="{% url 'blog:mod' %}" method="post">
+							{% csrf_token %}
+							<button name="hide_r" value="{{response.id}}"> Hide this response </button>
+							<input type="hidden" name="user_id" value="{{user.id}}">
+					</form>
+			</li>
+		{% endfor %}
+	</ul>
+	<h3> Flagged users: </h3> <br>
+	<ul>
+		{% for user in flagged_users %}
+			<li> {{ user.profile.handle }}, {{user.profile.inappropriate_count}} </li>
+		{% endfor %}
+	</ul>
+	<h3> Blocked users: </h3> <br>
+	<h3> Add a new mod: </h3> <br>
+{% endif %}

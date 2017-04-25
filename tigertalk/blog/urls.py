@@ -16,4 +16,5 @@ urlpatterns = [
     url(r'createprofile/', views.createprofile, name='createprofile'),
     url(r'filter/', views.filter, name='filter'),
     url(r'loginpage/', views.loginpage, name='loginpage'),
+    url(r'mod/', views.mod, name='mod'),
 ]
