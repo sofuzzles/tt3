@@ -14,3 +14,8 @@ class AnswerManager(models.Manager):
 class TagManager(models.Manager):
 	pass
 
+class BlockedManager(models.Manager):
+	pass
+
+class GenericManager(models.Manager):
+	pass

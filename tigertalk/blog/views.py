@@ -186,3 +186,34 @@ def loginpage(request):
 		}
 	template = loader.get_template("blog/loginpage.html")
 	return HttpResponse(template.render(context, request))
+
+def mod(request):
+	if not request.user.is_authenticated or not request.user.profile.modOrNot:
+		return HttpResponseRedirect(reverse('blog:index'))
+		
+	try:
+		delete_q = request.POST['delete_q']
+		q = Question.objects.get(pk=delete_q)
+		q.delete()
+	except:
+		pass
+		
+	try:
+		hide_r = request.POST['hide_r']
+		r = Answer.objects.get(pk=hide_r)
+		r.delete()
+	except:
+		pass
+	
+	inappropriate_questions = Question.objects.filter(inappropriateCount__gt=0).order_by('inappropriateCount')[:5]
+	inappropriate_responses = Answer.objects.filter(inappropriateCount__gt=0).order_by('inappropriateCount')[:5]
+	flagged_users = Profile.objects.filter(inappropriateCount__gt=0).order_by('inappropriateCount')[:5]
+	
+	context = {
+		'inappropriate_questions' : inappropriate_questions,
+		'inappropriate_responses' : inappropriate_responses,
+		'flagged_users' : flagged_users,
+	}
+	
+	template = loader.get_template('blog/mod.html')
+	return HttpResponse(template.render(context, request))
