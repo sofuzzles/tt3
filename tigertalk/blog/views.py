@@ -155,25 +155,16 @@ def createprofile(request):
 	if request.method == 'POST':
 		user = request.user
 		netidtxt = user.username
-		profile = Profile(handle=request.POST['handle'], classYear=request.POST['year'], user=user,initialized=True, netid=netidtxt, created_at=timezone.now())
-		profile.save()
-		#profile.handle = request.POST['handle']
-		#profile.classYear = request.POST['year']
-		#profile.initiated = True
-		#profile.netid = netidtxt
-		#profile.created_at = timezone.now()
-		#profile.user = user
-		#profile.save()
-		user.profile = profile
+		#user.profile = Profile(handle=request.POST['handle'], classYear=request.POST['year'],initialized=True, netid=netidtxt, created_at=timezone.now())
+		user.profile.handle = request.POST['handle']
+		user.profile.classYear = request.POST['year']
+		user.profile.initialized = True
+		user.profile.netid = netidtxt
+		user.profile.created_at = timezone.now()
+		# user.profile.user = user
+		# user.profile = profile
 		user.profile.save()
 		user.save()
-		#user.profile.handle = request.POST['handle']
-		#user.profile.classYear  = request.POST['year']
-		#user.profile.initiated = True
-		#user.profile.netid = netidtxt
-		#user.profile.created_at = timezone.now()
-		#user.profile.save()
-		#user.save()
 
 		return HttpResponseRedirect(reverse("blog:index"))
 
