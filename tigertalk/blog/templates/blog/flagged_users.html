@@ -1,6 +1,8 @@
 {% if user.is_authenticated and user.profile.modOrNot %}
 <h1> All flagged users </h1>
 
+<a href="{% url 'blog:mod' %}"> Return to mod page </a>
+
 {% for profile in flagged_profiles %}
 	{% if profile.user.blocked_info %}
 		<li> {{ profile.handle }} Flag Count: {{ profile.inappropriateCount }}
