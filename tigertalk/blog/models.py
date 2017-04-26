@@ -45,7 +45,6 @@ def create_user_profile(sender, **kwargs):
 # Question model
 class Question(models.Model):
     # Relations
-    user = models.ForeignKey(User, related_name='questions')
     # Attributes - Mandatory
     text = models.TextField()
     created_at = models.DateTimeField()
@@ -58,15 +57,11 @@ class Question(models.Model):
     # Object Manager
     objects = managers.QuestionManager()
     # Custom Properties
-    @property
-    def username(self):
-        return self.profile.handle
     # Methods
     # Meta and String
     class Meta:
         verbose_name = "Question"
         verbose_name_plural = "Questions"
-        ordering = ("user",)
         
     def __str__(self):
         return self.text
