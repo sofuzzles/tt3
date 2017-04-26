@@ -1,0 +1,23 @@
+{% if user.is_authenticated and user.profile.modOrNot %}
+<h1> All flagged users </h1>
+
+{% for profile in flagged_profiles %}
+	{% if profile.user.blocked_info %}
+		<li> {{ profile.handle }} Flag Count: {{ profile.inappropriateCount }}
+			<form action="{% url 'blog:flagged_users' %}" method="post">
+				{% csrf_token %}
+				<button name="block_user" value="{{profile.user.id}}"> Block this User  </button>
+				<input type="hidden" name="user_id" value="{{user.id}}">
+			</form>
+		</li>
+	{% else %}
+		<li> {{ profile.handle }} Flag Count: {{ profile.inappropriateCount }}
+			<form action="{% url 'blog:flagged_users' %}" method="post">
+				{% csrf_token %}
+				<button name="block_user" value="{{profile.user.id}}"> Block this User (1 week) </button>
+				<input type="hidden" name="user_id" value="{{user.id}}">
+			</form>
+		</li>
+	{% endif %}
+{% endfor %}
+{% endif %}

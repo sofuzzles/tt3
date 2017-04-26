@@ -1,22 +1,22 @@
 {% if user.is_authenticated %}
-{% if user.profile.initialized %}
-{% if user.profile.blockedOrNot %}
-<h1> Your account is blocked. Please contact a moderator if you think this is an error. </h1>
-<a href="/accounts/logout">Log out</a>
-{% else %}
-<h1> Thanks for Logging in! </h1>
-<form action="{% url 'blog:index' %}" method="get">                                                             
-       <button name="home" value="">Return to Home Page</button>              
-</form>
-{% endif %}
-{% else %}
+	{% if user.profile.initialized %}
+		{% if user.profile.blockedOrNot %}
+			<h1> Your account is blocked. Please contact a moderator at princetontigertalk@gmail.com if you think this is an error. </h1>
+			<a href="/accounts/logout">Log out</a>
+		{% else %}
+			<h1> Thanks for Logging in! </h1>
+			<form action="{% url 'blog:index' %}" method="get">                                                             
+				   <button name="home" value="">Return to Home Page</button>              
+			</form>
+		{% endif %}
+	{% else %}
 
-<h1> First time logging in? </h1>
-<form action="{% url 'blog:createprofile' %}" method="get">
-       <button name="home" value="">Please create your profile</button>
-</form>
+	<h1> First time logging in? </h1>
+		<form action="{% url 'blog:createprofile' %}" method="get">
+			   <button name="home" value="">Please create your profile</button>
+		</form>
 
-{% endif %}
+	{% endif %}
 {% else %}
-<a href="/accounts/login">Log in!</a>
+	<a href="/accounts/login">Log in!</a>
 {% endif %}

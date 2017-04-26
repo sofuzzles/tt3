@@ -14,7 +14,7 @@ from .models import Question, Tag, Profile, Answer
 
 def index(request):
 	#q_list = Question.objects.order_by('-created_at')
-	questions = Question.objects.order_by('-created_at')
+	questions = Question.objects.filter(blockedOrNot=False).order_by('-created_at')
 	user = request.user
 	#paginator = Paginator(q_list, 5)
 	#page = request.GET.get('page')
@@ -43,14 +43,15 @@ def index(request):
 
 	# questions the user flagged
 	try:
-		flagged_q = Question.objects.get(pk=request.GET['flag_q'])
+		flagged_q = Question.objects.get(pk=request.POST['flag_q'])
 		user  = request.user
 		flagged_q.inappropriateCount += 1
 		flagged_q.inappropriateId.add(user)
 		flagged_q.save()
-		cur_page = request.GET['page']
 		user.flagged_questions.add(flagged_q)
 		user.save()
+		
+		cur_page = request.GET['page']
 	except:
 		pass
 
@@ -81,15 +82,10 @@ def index(request):
 		#'page': page,
 		#'page_template': page_template,
 	}
-	print(cur_page)
+	#print(cur_page)
 	#if request.is_ajax():
 		#template = page_template
 	return HttpResponse(template.render(context, request))
-	
-def blocked(request):
-	template = loader.get_template('blog/blocked.html')
-	context = {}
-	return HttpResponse(template.render(context, request))	
 
 
 def update_responses(request):
@@ -125,8 +121,6 @@ def filter(request):
 			allowed_question_list.append(q)
 	
 	allowed_question_list = allowed_question_list[:5]
-	print(search_tags)
-	print(allowed_question_list)
 	template = loader.get_template('blog/index.html')
 	context = {
 		'latest_question_list' : allowed_question_list,
@@ -163,6 +157,24 @@ def postaq(request):
 	
 		return HttpResponseRedirect(reverse("blog:index"))
 	
+def loginpage(request):
+	if request.user.is_authenticated and request.user.profile.blockedOrNot:
+		current_time = timezone.now()
+		if (current_time - request.user.profile.created_at).days > 7:
+			if user.blocked_info.count == 1:
+				user.profile.blockedOrNot = False
+				user.profile.save()
+			
+	context = {
+		'user': request.user,
+		}
+	template = loader.get_template("blog/loginpage.html")
+	return HttpResponse(template.render(context, request))
+	
+def blocked(request):
+	template = loader.get_template('blog/blocked.html')
+	context = {}
+	return HttpResponse(template.render(context, request))	
 	
 def createprofile(request):
 	if request.method == 'POST':
@@ -183,18 +195,113 @@ def createprofile(request):
 
 	return render(request, 'blog/createprofile.html', {})
     
-
-def loginpage(request):
+def inappropriate_qs(request):
+	if not request.user.is_authenticated or not request.user.profile.modOrNot:
+		return HttpResponseRedirect(reverse('blog:index'))
+	try:
+		delete_q = request.POST['delete_q']
+		q = Question.objects.get(pk=delete_q)
+		q.delete()
+	except:
+		pass
+	
+	inappropriate_questions = Question.objects.filter(inappropriateCount__gt=0).order_by('-inappropriateCount')
 	context = {
-		'user': request.user,
-		}
-	template = loader.get_template("blog/loginpage.html")
+		'inappropriate_questions' : inappropriate_questions,
+	}
+	
+	template = loader.get_template('blog/inappropriate_qs.html')
+	
 	return HttpResponse(template.render(context, request))
+
+def inappropriate_rs(request):
+	if not request.user.is_authenticated or not request.user.profile.modOrNot:
+		return HttpResponseRedirect(reverse('blog:index'))
+	try:
+		delete_r = request.POST['delete_r']
+		r = Answer.objects.get(pk=delete_r)
+		r.blockedOrNot = True
+	except:
+		pass
+	
+	inappropriate_responses = Answer.objects.filter(inappropriateCount__gt=0).filter(blockedOrNot=False).order_by('-inappropriateCount')
+	context = {
+		'inappropriate_responses' : inappropriate_responses,
+	}
+	
+	template = loader.get_template('blog/inappropriate_rs.html')
+	
+	return HttpResponse(template.render(context, request))
+	
+def flagged_users(request):
+	if not request.user.is_authenticated or not request.user.profile.modOrNot:
+		return HttpResponseRedirect(reverse('blog:index'))
+	
+	try:
+		block_user = User.objects.get(pk=request.POST['block_user'])
+		block_user.profile.blockedOrNot = True
+		block_user.profile.save()
+		block_user.save()
+		
+		try:
+			block_user.blocked_info.count += 1
+			block_user.blocked_info.blocked_at = timezone.now()
+			block_user.blocked_info.save()
+		except:
+			block_info = Blocked(user=block_user,count=1,blocked_at=timezone.now())
+			block_user.blocked_info = block_info
+			block_user.blocked_info.save()
+			block_user.save()		
+	except:
+		pass
+		
+	flagged_profiles = Profile.objects.filter(inappropriateCount__gt=0).filter(blockedOrNot=False).order_by('-inappropriateCount')
+
+	context = {
+		'flagged_profiles': flagged_profiles,
+	}
+	template = loader.get_template('blog/flagged_users.html')
+	
+	return HttpResponse(template.render(context, request))
+
 
 def mod(request):
 	if not request.user.is_authenticated or not request.user.profile.modOrNot:
 		return HttpResponseRedirect(reverse('blog:index'))
+
+	try:
+		block_user = User.objects.get(pk=request.POST['block_user'])
+		block_user.profile.blockedOrNot = True
+		block_user.profile.save()
 		
+		try:
+			block_user.blocked_info.count += 1
+			block_user.blocked_info.blocked_at = timezone.now()
+			block_user.blocked_info.save()
+		except:
+			block_info = Blocked(user=block_user,count=1,blocked_at=timezone.now())
+			block_user.blocked_info = block_info
+			block_user.blocked_info.save()
+			block_user.save()		
+	except:
+		pass
+		
+	try:
+		mod_handle = request.POST['new_mod_handle']
+		mod_profile = Profile.objects.filter(handle=mod_handle)[0]
+		mod_profile.modOrNot = True
+		mod_profile.save()
+	except:
+		pass
+		
+	try:
+		unblock_handle = request.POST['unblock_user']
+		unblock_profile = Profile.objects.filter(handle=unblock_handle)[0]
+		unblock_profile.blockedOrNot = False
+		unblock_profile.save()
+	except:
+		pass
+	
 	try:
 		delete_q = request.POST['delete_q']
 		q = Question.objects.get(pk=delete_q)
@@ -209,14 +316,14 @@ def mod(request):
 	except:
 		pass
 	
-	inappropriate_questions = Question.objects.filter(inappropriateCount__gt=0).order_by('inappropriateCount')[:5]
-	inappropriate_responses = Answer.objects.filter(inappropriateCount__gt=0).order_by('inappropriateCount')[:5]
-	flagged_users = Profile.objects.filter(inappropriateCount__gt=0).order_by('inappropriateCount')[:5]
+	inappropriate_questions = Question.objects.filter(inappropriateCount__gt=0).order_by('-inappropriateCount')[:5]
+	inappropriate_responses = Answer.objects.filter(inappropriateCount__gt=0).order_by('-inappropriateCount')[:5]
+	flagged_profiles = Profile.objects.filter(inappropriateCount__gt=0).filter(blockedOrNot=False).order_by('-inappropriateCount')[:5]
 	
 	context = {
 		'inappropriate_questions' : inappropriate_questions,
 		'inappropriate_responses' : inappropriate_responses,
-		'flagged_users' : flagged_users,
+		'flagged_profiles' : flagged_profiles,
 	}
 	
 	template = loader.get_template('blog/mod.html')
