@@ -44,6 +44,13 @@
 		<input type="hidden" name="user_id" value="{{user.id}}">
 		<input type="Submit" name="submit">
 	</form>
+	<h3> See a user's post history: </h3>
+	<form action="{% url 'blog:see_user_history' %}" method="get">
+		{% csrf_token %}
+		<input type="text" name="det_user" value="" placeholder="Write handle here">
+		<input type="hidden" name="user_id" value="{{user.id}}">
+		<input type="Submit" name="submit">
+	</form>
 	<h3> Add a new mod: </h3> 
 	<form action="{% url 'blog:mod' %}" method="post">
 		{% csrf_token %}

@@ -238,6 +238,25 @@ def flagged_users(request):
 	return HttpResponse(template.render(context, request))
 
 
+def see_user_history(request):
+	if not request.user.is_authenticated or not request.user.profile.modOrNot:
+		return HttpResponseRedirect(reverse('blog:index'))
+	
+	try:
+		det_user = Profile.objects.get(handle=request.GET['det_user']).user
+		responses = det_user.answers.all()
+	except:
+		pass
+	
+	context = {
+		'det_user' : det_user,
+		'responses' : responses,
+	}
+	template = loader.get_template('blog/detailed_user.html')
+	
+	return HttpResponse(template.render(context, request))
+
+
 def mod(request):
 	if not request.user.is_authenticated or not request.user.profile.modOrNot:
 		return HttpResponseRedirect(reverse('blog:index'))
