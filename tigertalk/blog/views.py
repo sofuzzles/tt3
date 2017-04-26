@@ -13,12 +13,7 @@ from el_pagination import utils
 from .models import Question, Tag, Profile, Answer
 
 def index(request):
-<<<<<<< HEAD
-	#q_list = Question.objects.order_by('-created_at')
 	questions = Question.objects.filter(blockedOrNot=False).order_by('-created_at')
-=======
-	questions = Question.objects.order_by('-created_at')
->>>>>>> 04bae806585b79a16200012ae84ee8a3581cb8b2
 	user = request.user
 	try:
 		exp_question = Question.objects.get(pk=request.GET['responses_requested'])
@@ -75,13 +70,7 @@ def index(request):
 		'expanded_answers': exp_answers,
 		'cur_page': cur_page,
 	}
-<<<<<<< HEAD
-	#print(cur_page)
-	#if request.is_ajax():
-		#template = page_template
-=======
-	print(cur_page)
->>>>>>> 04bae806585b79a16200012ae84ee8a3581cb8b2
+
 	return HttpResponse(template.render(context, request))
 
 
