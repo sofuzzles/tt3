@@ -13,11 +13,8 @@ from el_pagination import utils
 from .models import Question, Tag, Profile, Answer
 
 def index(request):
-	#q_list = Question.objects.order_by('-created_at')
 	questions = Question.objects.order_by('-created_at')
 	user = request.user
-	#paginator = Paginator(q_list, 5)
-	#page = request.GET.get('page')
 	try:
 		exp_question = Question.objects.get(pk=request.GET['responses_requested'])
 		cur_page = request.GET['page']
@@ -61,13 +58,6 @@ def index(request):
 	except:
 		flagged_question_list = []
 
-
-	#try:
-		#questions = paginator.page(page)
-	#except PageNotAnInteger:
-		#questions = paginator.page(1)
-	#except EmptyPage:
-		#questions = paginator.page(paginator.num_pages)
 	
 	template = loader.get_template('blog/index.html')
 	context = {
@@ -78,12 +68,8 @@ def index(request):
 		'flagged_question_list': flagged_question_list,
 		'expanded_answers': exp_answers,
 		'cur_page': cur_page,
-		#'page': page,
-		#'page_template': page_template,
 	}
 	print(cur_page)
-	#if request.is_ajax():
-		#template = page_template
 	return HttpResponse(template.render(context, request))
 	
 def blocked(request):
@@ -93,17 +79,8 @@ def blocked(request):
 
 
 def update_responses(request):
-#	if request.user.is_anonymous():
-#		return HttpResponseRedirect("/accounts/login/")
 	a = request.POST['response']
 	q = request.POST['question_id']
-	
-	#user_id = request.POST['user_id']
-	#userobj = User.objects.get(id=user_id)
-	#netidtxt = request.user.username
-      		
-	# prof.save()
-	#anon_user = User.objects.all()[0]
 	
 	answer = Answer(text=a, user=request.user, created_at=timezone.now(), question=Question.objects.get(pk=q))
 	answer.save()
@@ -149,8 +126,7 @@ def postaq(request):
 		q = request.POST['question']
 		t = request.POST['tags'].split()
 		
-		anon_user = User.objects.all()[0]
-		question = Question(text=q, user=anon_user, created_at=timezone.now())
+		question = Question(text=q, created_at=timezone.now())
 		question.save()
 		
 		for tag in t:
@@ -168,14 +144,11 @@ def createprofile(request):
 	if request.method == 'POST':
 		user = request.user
 		netidtxt = user.username
-		#user.profile = Profile(handle=request.POST['handle'], classYear=request.POST['year'],initialized=True, netid=netidtxt, created_at=timezone.now())
 		user.profile.handle = request.POST['handle']
 		user.profile.classYear = request.POST['year']
 		user.profile.initialized = True
 		user.profile.netid = netidtxt
 		user.profile.created_at = timezone.now()
-		# user.profile.user = user
-		# user.profile = profile
 		user.profile.save()
 		user.save()
 
