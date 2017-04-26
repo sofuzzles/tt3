@@ -7,6 +7,9 @@
             <button name="login" value="{{question.id}}">Click here to Log-in/Register</button>
     </form>
 {% endif %}
+{% if user.is_authenticated and user.profile.modOrNot %}
+	<a href="{% url 'blog:mod' %}"> Mod page </a>
+{% endif %}
 
 <h3>Questions</h3>
 

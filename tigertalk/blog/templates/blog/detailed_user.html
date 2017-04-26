@@ -1,9 +1,10 @@
 {% if user.is_authenticated and user.profile.modOrNot %}
-<h1> All responses marked inappropriate </h1>
+
+<h1> {{det_user.profile.handle}}'s response history </h1>
 
 <a href="{% url 'blog:mod' %}"> Return to mod page </a>
 
-{% for response in inappropriate_responses %}
+{% for response in responses %}
 	<li> {{ response.text }} Flag Count: {{ response.inappropriateCount }} 
 		<form action="{% url 'blog:inappropriate_rs' %}" method="post">
 			{% csrf_token %}

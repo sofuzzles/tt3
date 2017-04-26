@@ -1,5 +1,6 @@
 {% if user.is_authenticated and user.profile.modOrNot %}
 	<h1> Moderator home page </h1>
+	<a href="{% url 'blog:index' %}"> Home </a>
 	<h3> <a href="{% url 'blog:inappropriate_qs' %}">Questions marked inappropriate: </a></h3> <br>
 	<ul>
 		{% for question in inappropriate_questions %}
@@ -40,6 +41,13 @@
 	<form action="{% url 'blog:mod' %}" method="post">
 		{% csrf_token %}
 		<input type="text" name="unblock_user" value="" placeholder="Write handle here">
+		<input type="hidden" name="user_id" value="{{user.id}}">
+		<input type="Submit" name="submit">
+	</form>
+	<h3> See a user's post history: </h3>
+	<form action="{% url 'blog:see_user_history' %}" method="get">
+		{% csrf_token %}
+		<input type="text" name="det_user" value="" placeholder="Write handle here">
 		<input type="hidden" name="user_id" value="{{user.id}}">
 		<input type="Submit" name="submit">
 	</form>

@@ -15,4 +15,5 @@ urlpatterns = [
 	url(r'inappropriate_qs/', views.inappropriate_qs, name='inappropriate_qs'),
 	url(r'inappropriate_rs/', views.inappropriate_rs, name='inappropriate_rs'),
 	url(r'flagged_users/', views.flagged_users, name='flagged_users'),
+	url(r'see_user_history/', views.see_user_history, name='see_user_history'),
 ]
