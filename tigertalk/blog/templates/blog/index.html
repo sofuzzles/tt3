@@ -48,7 +48,28 @@ Filter by tag:
         {% if question in expanded_question_list %}
         	<ul>
         	{% for answer in expanded_answers %}
-        		<li>{{answer.text}} -{{answer.user.profile.handle}}</li>
+        		 {% if user.is_authenticated and not user.profile.blockedOrNot %}
+     
+                    {% if answer in helpful_responses_list %}
+                        You have already marked this answer as helpful <br>
+                    {% else %}
+                         <form action="{% url 'blog:index' %}" method="get">
+                            <button name="helpful" value="{{answer.id}}">Mark this response as helpful</button>
+                            <input type="hidden" name="user_id" value="{{user.id}}">
+                        </form>
+                    {% endif %}
+                    {% if answer in inapp_responses_list %}
+                        You have already flagged this answer as inappropriate <br>
+                    {% else %}
+                          <form action="{% url 'blog:index' %}" method="get">
+                               <button name="inapp" value="{{answer.id}}">Flag this response as innapropriate</button>
+                               <input type="hidden" name="user_id" value="{{user.id}}">
+                          </form>
+                	{% endif %}
+                {% endif %}
+        		<li>{{answer.text}} - {{answer.user.profile.handle}}</li>
+                Helpful Count is {{answer.helpfulCount}} <br>
+            	Inappropriate Count is {{answer.inappropriateCount}}
         	{% empty %}
         		No answers, lol, sorry.
         	{% endfor %}

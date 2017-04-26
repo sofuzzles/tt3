@@ -3,6 +3,9 @@
 <h3>Welcome to the pack! Enter the information below so you can start answering and voting on answers: </h3>
 
 <form method="post" action="{% url 'blog:createprofile' %}">
+{% if handle_in_use %}
+This handle is already in use <br>
+{% endif %}
 {% csrf_token %}
 Username (this will appear instead of your netID): <br>
 <input type="text" name="handle"> <br>

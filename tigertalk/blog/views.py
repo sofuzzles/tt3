@@ -13,12 +13,9 @@ from el_pagination import utils
 from .models import Question, Tag, Profile, Answer
 
 def index(request):
-<<<<<<< HEAD
 	#q_list = Question.objects.order_by('-created_at')
 	questions = Question.objects.filter(blockedOrNot=False).order_by('-created_at')
-=======
 	questions = Question.objects.order_by('-created_at')
->>>>>>> 04bae806585b79a16200012ae84ee8a3581cb8b2
 	user = request.user
 	try:
 		exp_question = Question.objects.get(pk=request.GET['responses_requested'])
@@ -65,6 +62,50 @@ def index(request):
 		flagged_question_list = []
 
 	
+	# mark response as helpful
+	try:
+		helpful_answer = Answer.objects.get(pk=request.GET['helpful'])
+		user = request.user
+		helpful_answer.helpfulCount += 1
+		helpful_answer.helpfulId.add(user)
+		helpful_answer.save()
+
+		user.helpful_responses.add(helpful_answer)
+		user.save()
+
+	except: 
+		pass
+
+	#no double flagging					    
+	try:
+		user = request.user
+		helpful_responses_list = user.helpful_responses.all()
+	except: 
+		helpful_responses_list = []
+
+	# response flagging 
+	try:
+		inapp_answer = Answer.objects.get(pk=request.GET['inapp'])
+		user = request.user
+		inapp_answer.inappropriateCount += 1
+		inapp_answer.inappropriateId.add(user)
+		inapp_answer.save()
+
+		inapp_answer.user.inappropriateCount += 1
+		inapp_answer.user.save()
+
+		user.inappropriate_responses.add(inapp_answer)
+		user.save()
+	
+	except:
+		pass
+
+	try:
+		user = request.user
+		inapp_responses_list = user.inappropriate_responses.all()
+	except:
+		inapp_responses_list = []
+	
 	template = loader.get_template('blog/index.html')
 	context = {
 		'questions' : questions,
@@ -74,14 +115,14 @@ def index(request):
 		'flagged_question_list': flagged_question_list,
 		'expanded_answers': exp_answers,
 		'cur_page': cur_page,
+		'helpful_responses_list': helpful_responses_list, 
+		'inapp_responses_list': inapp_responses_list, 
 	}
-<<<<<<< HEAD
+
 	#print(cur_page)
 	#if request.is_ajax():
 		#template = page_template
-=======
 	print(cur_page)
->>>>>>> 04bae806585b79a16200012ae84ee8a3581cb8b2
 	return HttpResponse(template.render(context, request))
 
 
@@ -164,9 +205,21 @@ def blocked(request):
 	return HttpResponse(template.render(context, request))	
 	
 def createprofile(request):
+	handle_in_use = 0
 	if request.method == 'POST':
 		user = request.user
 		netidtxt = user.username
+		#user.profile = Profile(handle=request.POST['handle'], classYear=request.POST['year'],initialized=True, netid=netidtxt, created_at=timezone.now())
+		handle = request.POST['handle']
+		handle_in_use = 0
+		for profile_obj in Profile.objects.all():
+			if handle == profile_obj.handle:
+				handle_in_use = 1
+				context = {'handle_in_use': handle_in_use,}
+				template = loader.get_template('blog/createprofile.html')
+				return HttpResponse(template.render(context, request))
+
+		user.profile.handle = handle 
 		user.profile.handle = request.POST['handle']
 		user.profile.classYear = request.POST['year']
 		user.profile.initialized = True
@@ -177,7 +230,9 @@ def createprofile(request):
 
 		return HttpResponseRedirect(reverse("blog:index"))
 
-	return render(request, 'blog/createprofile.html', {})
+	template = loader.get_template('blog/createprofile.html')
+	context = {'handle_in_use': handle_in_use,}
+	return HttpResponse(template.render(context, request))
     
 def inappropriate_qs(request):
 	if not request.user.is_authenticated or not request.user.profile.modOrNot:
