@@ -1,0 +1,13 @@
+{% if user.is_authenticated and user.profile.modOrNot %}
+<h1> All questions marked inappropriate </h1>
+
+{% for question in inappropriate_questions %}
+	<li> {{ question.text }} Flag Count: {{question.inappropriateCount}}
+		<form action="{% url 'blog:inappropriate_qs' %}" method="post">
+			{% csrf_token %}
+			<button name="delete_q" value="{{question.id}}"> Delete this question </button>
+			<input type="hidden" name="user_id" value="{{user.id}}">
+		</form>
+	</li>
+{% endfor %}
+{% endif %}

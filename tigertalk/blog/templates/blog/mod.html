@@ -1,9 +1,9 @@
 {% if user.is_authenticated and user.profile.modOrNot %}
 	<h1> Moderator home page </h1>
-	<h3> Questions marked inappropriate: </h3> <br>
+	<h3> <a href="{% url 'blog:inappropriate_qs' %}">Questions marked inappropriate: </a></h3> <br>
 	<ul>
 		{% for question in inappropriate_questions %}
-			<li> {{ question.text }} 
+			<li> {{ question.text }}	 Flag Count: {{question.inappropriateCount}} 
 					<form action="{% url 'blog:mod' %}" method="post">
 							{% csrf_token %}
 							<button name="delete_q" value="{{question.id}}"> Delete this question </button>
@@ -12,10 +12,10 @@
 			</li>
 		{% endfor %}
 	</ul>
-	<h3> Responses marked inappropriate: </h3> <br>
+	<h3> <a href="{% url 'blog:inappropriate_rs' %}">Responses marked inappropriate: </a></h3> <br>
 	<ul>
 		{% for response in inappropriate_responses %}
-			<li> {{ response.text }} 
+			<li> {{ response.text }}	 Flag Count: {{response.inappropriateCount}}  
 					<form action="{% url 'blog:mod' %}" method="post">
 							{% csrf_token %}
 							<button name="hide_r" value="{{response.id}}"> Hide this response </button>
@@ -24,12 +24,30 @@
 			</li>
 		{% endfor %}
 	</ul>
-	<h3> Flagged users: </h3> <br>
+	<h3> <a href="{% url 'blog:flagged_users' %}"> Flagged users: </a></h3> <br>
 	<ul>
-		{% for user in flagged_users %}
-			<li> {{ user.profile.handle }}, {{user.profile.inappropriate_count}} </li>
+		{% for profile in flagged_profiles %}
+			<li> {{ profile.handle }} Flag Count: {{ profile.inappropriateCount }} 
+				<form action="{% url 'blog:mod' %}" method="post">
+							{% csrf_token %}
+							<button name="block_user" value="{{profile.user.id}}"> Block this user </button>
+							<input type="hidden" name="user_id" value="{{user.id}}">
+					</form>
+			</li>
 		{% endfor %}
 	</ul>
-	<h3> Blocked users: </h3> <br>
-	<h3> Add a new mod: </h3> <br>
+	<h3> Unblock a user: </h3>
+	<form action="{% url 'blog:mod' %}" method="post">
+		{% csrf_token %}
+		<input type="text" name="unblock_user" value="" placeholder="Write handle here">
+		<input type="hidden" name="user_id" value="{{user.id}}">
+		<input type="Submit" name="submit">
+	</form>
+	<h3> Add a new mod: </h3> 
+	<form action="{% url 'blog:mod' %}" method="post">
+		{% csrf_token %}
+		<input type="text" name="new_mod_handle" value="" placeholder="Write handle here">
+		<input type="hidden" name="user_id" value="{{user.id}}">
+		<input type="Submit" name="submit">
+	</form>
 {% endif %}

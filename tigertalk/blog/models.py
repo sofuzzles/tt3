@@ -8,7 +8,6 @@ from django.dispatch import receiver
 from . import managers
 
 # Profile model
-# TODO: add inappropriate count
 class Profile(models.Model):
     # Relations
     user = models.OneToOneField(User, on_delete=models.CASCADE)
