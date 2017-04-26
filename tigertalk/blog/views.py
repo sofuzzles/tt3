@@ -119,9 +119,6 @@ def index(request):
 		'inapp_responses_list': inapp_responses_list, 
 	}
 
-	#print(cur_page)
-	#if request.is_ajax():
-		#template = page_template
 	print(cur_page)
 	return HttpResponse(template.render(context, request))
 
