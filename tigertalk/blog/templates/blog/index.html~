@@ -26,14 +26,15 @@ Filter by tag:
 {% for question in questions %}
 {% show_current_number as page_number %}
 <div id="resp_results{{question.id}}">
-        <li>{{ question.text }}</li> <br>
+        <li>{{ question.text|truncatechars:100 }}</li> <br>
         {% if user.is_authenticated and not user.profile.blockedOrNot %}
             {% if question in flagged_question_list %}
                 You have flagged this question <br>
             {% else %}
-                <form action="{% url 'blog:index' %}" method="get">
+                <form action="{% url 'blog:index' %}" method="post">
                         <button name="flag_q" value="{{question.id}}">Flag this question as inappropriate</button>
                         <input type="hidden" name="user_id" value="{{user.id}}">
+			 <input type="hidden" name="page" value="{{page_number}}">
                 </form>
             {% endif %}
         {% endif %}
@@ -54,6 +55,7 @@ Filter by tag:
 	
         	<form action="{% url 'blog:index' %}#resp_results{{question.id}}" method="get">
 				<button name="close_requested" value="{{question.id}}">Close response(s)</button>
+				<input type="hidden" name="page" value="{{page_number}}">
 			</form>
         {% else %}
 			<form action="{% url 'blog:index' %}#resp_results{{question.id}}" method="get">
@@ -69,6 +71,7 @@ Filter by tag:
   				<input type="hidden" name="question_id" value="{{question.id}}">
   				<input type="submit" value="Submit">
 				<input type="hidden" name="user_id" value="{{user.id}}">
+				 <input type="hidden" name="page" value="{{page_number}}">
 			</form>
 			{% else %}
 			<form action="{% url 'blog:loginpage' %}" method="get">
@@ -78,6 +81,7 @@ Filter by tag:
 		{% else %}
 			<form action="{% url 'blog:index' %}" method="get">
 				<button name="respond_to_q" value="{{question.id}}">Submit a Response</button>
+				 <input type="hidden" name="page" value="{{page_number}}">
 			</form>
 		{% endif %}
 </div>
