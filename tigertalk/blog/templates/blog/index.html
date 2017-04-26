@@ -26,7 +26,7 @@ Filter by tag:
 {% for question in questions %}
 {% show_current_number as page_number %}
 <div id="resp_results{{question.id}}">
-        <li>{{ question.text|truncatechars:200 }}</li> <br>
+        <a href="{% url 'blog:questions' question.id %}">{{ question.text|truncatechars:200 }}</a> <br>
         {% if user.is_authenticated and not user.profile.blockedOrNot %}
             {% if question in flagged_question_list %}
                 You have flagged this question <br>
