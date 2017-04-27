@@ -16,4 +16,6 @@ urlpatterns = [
 	url(r'inappropriate_rs/', views.inappropriate_rs, name='inappropriate_rs'),
 	url(r'flagged_users/', views.flagged_users, name='flagged_users'),
 	url(r'see_user_history/', views.see_user_history, name='see_user_history'),
+	url(r'admin/', views.admin, name='admin'),
+	url(r'see_mod_history/', views.see_mod_history, name='see_mod_history'),
 ]

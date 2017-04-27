@@ -1,0 +1,44 @@
+{% if user.is_authenticated and user.profile.modOrNot %}
+Currently logged in as {{user.profile.handle}}. <a href="/accounts/logout">Log out</a>
+
+<h1> {{mod.profile.handle}}'s mod history </h1>
+
+<a href="{% url 'blog:admin' %}"> Return to admin page </a>
+
+<h3> Hidden responses: </h1>
+{% for response in responses %}
+	<li> {{ response.text }} Flag Count: {{ response.inappropriateCount }} 
+		<form action="{% url 'blog:see_mod_history' %}" method="post">
+			{% csrf_token %}
+			<button name="restore_r" value="{{response.id}}"> Restore this response </button>
+			<input type="hidden" name="user_id" value="{{user.id}}">
+			<input type="hidden" name="mod" value="{{mod.profile.handle}}">
+		</form>
+	</li>
+{% endfor %}
+
+<h3> Blocked questions: </h1>
+{% for question in questions %}
+	<li> {{ question.text }} Flag Count: {{ question.inappropriateCount }} 
+		<form action="{% url 'blog:see_mod_history' %}" method="post">
+			{% csrf_token %}
+			<button name="restore_q" value="{{question.id}}"> Restore this question </button>
+			<input type="hidden" name="user_id" value="{{user.id}}">
+			<input type="hidden" name="mod" value="{{mod.profile.handle}}">
+		</form>
+	</li>
+{% endfor %}
+
+<h3> Blocked users: </h1>
+{% for b_user in users %}
+	<li> {{ b_user.handle }} Flag Count: {{ b_user.inappropriateCount }} 
+		<form action="{% url 'blog:see_mod_history' %}" method="post">
+			{% csrf_token %}
+			<button name="unblock_user" value="{{b_user.id}}"> Unblock this user </button>
+			<input type="hidden" name="user_id" value="{{user.id}}">
+			<input type="hidden" name="mod" value="{{mod.profile.handle}}">
+		</form>
+	</li>
+{% endfor %}
+
+{% endif %}

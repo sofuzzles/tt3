@@ -13,9 +13,7 @@ from el_pagination import utils
 from .models import Question, Tag, Profile, Answer
 
 def index(request):
-	#q_list = Question.objects.order_by('-created_at')
 	questions = Question.objects.filter(blockedOrNot=False).order_by('-created_at')
-	questions = Question.objects.order_by('-created_at')
 	user = request.user
 	try:
 		exp_question = Question.objects.get(pk=request.GET['responses_requested'])
@@ -119,7 +117,6 @@ def index(request):
 		'inapp_responses_list': inapp_responses_list, 
 	}
 
-	#print(cur_page)
 	return HttpResponse(template.render(context, request))
 
 
@@ -243,11 +240,13 @@ def inappropriate_qs(request):
 	try:
 		delete_q = request.POST['delete_q']
 		q = Question.objects.get(pk=delete_q)
-		q.delete()
+		q.blockedOrNot = True
+		q.blocked_by = User.objects.get(pk=request.POST['user_id'])
+		q.save()
 	except:
 		pass
 	
-	inappropriate_questions = Question.objects.filter(inappropriateCount__gt=0).order_by('-inappropriateCount')
+	inappropriate_questions = Question.objects.filter(inappropriateCount__gt=0).filter(blockedOrNot=False).order_by('-inappropriateCount')
 	context = {
 		'inappropriate_questions' : inappropriate_questions,
 	}
@@ -263,6 +262,7 @@ def inappropriate_rs(request):
 		delete_r = request.POST['delete_r']
 		r = Answer.objects.get(pk=delete_r)
 		r.blockedOrNot = True
+		r.blocked_by = User.objects.get(pk=request.POST['user_id'])
 	except:
 		pass
 	
@@ -282,6 +282,7 @@ def flagged_users(request):
 	try:
 		block_user = User.objects.get(pk=request.POST['block_user'])
 		block_user.profile.blockedOrNot = True
+		block_user.profile.blocked_by = User.objects.get(pk=request.POST['user_id'])
 		block_user.profile.save()
 		block_user.save()
 		
@@ -306,7 +307,6 @@ def flagged_users(request):
 	
 	return HttpResponse(template.render(context, request))
 
-
 def see_user_history(request):
 	if not request.user.is_authenticated or not request.user.profile.modOrNot:
 		return HttpResponseRedirect(reverse('blog:index'))
@@ -325,14 +325,68 @@ def see_user_history(request):
 	
 	return HttpResponse(template.render(context, request))
 
+def see_mod_history(request):
+	if not request.user.is_authenticated or not request.user.profile.is_admin:
+		return HttpResponseRedirect(reverse('blog:index'))
+				
+	try: # TODO add unblocked by
+		unblock_profile = Profile.objects.get(pk=request.POST['unblock_user'])
+		unblock_profile.blockedOrNot = False
+		unblock_profile.blocked_by = None
+		unblock_profile.save()
+	except:
+		pass
+	
+	try:
+		restore_q = request.POST['restore_q']
+		q = Question.objects.get(pk=delete_q)
+		q.blockedOrNot = False
+		q.blocked_by = None
+		q.save()
+	except:
+		pass
+		
+	try:
+		restore_r = request.POST['restore_r']
+		r = Answer.objects.get(pk=hide_r)
+		r.blockedOrNot = False
+		r.blocked_by = None
+		r.save()
+	except:
+		pass
+	
+	try:
+		mod_prof = Profile.objects.filter(handle=request.GET['mod'])[0]
+		mod = mod_prof.user
+	except: 
+		try:
+			mod_prof = Profile.objects.filter(handle=request.POST['mod'])[0]
+			mod = mod_prof.user
+		except: 
+			pass
+	
+	questions = Question.objects.filter(blocked_by=mod).order_by('-inappropriateCount')[:5]
+	responses = Answer.objects.filter(blocked_by=mod).order_by('-inappropriateCount')[:5]
+	users = Profile.objects.filter(blocked_by=mod).order_by('-inappropriateCount')[:5]
+	
+	context = {
+		'questions' : questions,
+		'responses' : responses,
+		'users' : users,
+		'mod' : mod,
+	}
+	
+	template = loader.get_template('blog/detailed_mod.html')
+	return HttpResponse(template.render(context, request))
 
-def mod(request):
-	if not request.user.is_authenticated or not request.user.profile.modOrNot:
+def admin(request):
+	if not request.user.is_authenticated or not request.user.profile.is_admin:
 		return HttpResponseRedirect(reverse('blog:index'))
 
-	try:
+	try: # should probably put this in Blocked info
 		block_user = User.objects.get(pk=request.POST['block_user'])
 		block_user.profile.blockedOrNot = True
+		block_user.profile.blocked_by = User.objects.get(pk=request.POST['user_id'])
 		block_user.profile.save()
 		
 		try:
@@ -347,15 +401,23 @@ def mod(request):
 	except:
 		pass
 		
-	try:
+	try: # TODO add modded by
 		mod_handle = request.POST['new_mod_handle']
 		mod_profile = Profile.objects.filter(handle=mod_handle)[0]
 		mod_profile.modOrNot = True
 		mod_profile.save()
 	except:
 		pass
+	
+	try: # TODO add admin'd by
+		admin_handle = request.POST['new_admin_handle']
+		admin_profile = Profile.objects.filter(handle=admin_handle)[0]
+		admin_profile.is_admin = True
+		admin_profile.save()
+	except:
+		pass
 		
-	try:
+	try: # TODO add unblocked by
 		unblock_handle = request.POST['unblock_user']
 		unblock_profile = Profile.objects.filter(handle=unblock_handle)[0]
 		unblock_profile.blockedOrNot = False
@@ -366,14 +428,89 @@ def mod(request):
 	try:
 		delete_q = request.POST['delete_q']
 		q = Question.objects.get(pk=delete_q)
-		q.delete()
+		q.blockedOrNot = True
+		q.blocked_by = User.objects.get(pk=request.POST['user_id'])
+		q.save()
 	except:
 		pass
 		
 	try:
 		hide_r = request.POST['hide_r']
 		r = Answer.objects.get(pk=hide_r)
-		r.delete()
+		r.blockedOrNot = True
+		r.blocked_by = User.objects.get(pk=request.POST['user_id'])
+		r.save()
+	except:
+		pass
+	
+	inappropriate_questions = Question.objects.filter(inappropriateCount__gt=0).order_by('-inappropriateCount')[:5]
+	inappropriate_responses = Answer.objects.filter(inappropriateCount__gt=0).order_by('-inappropriateCount')[:5]
+	flagged_profiles = Profile.objects.filter(inappropriateCount__gt=0).filter(blockedOrNot=False).order_by('-inappropriateCount')[:5]
+	
+	context = {
+		'inappropriate_questions' : inappropriate_questions,
+		'inappropriate_responses' : inappropriate_responses,
+		'flagged_profiles' : flagged_profiles,
+	}
+	
+	template = loader.get_template('blog/admin.html')
+	return HttpResponse(template.render(context, request))
+
+
+def mod(request):
+	if not request.user.is_authenticated or not request.user.profile.modOrNot:
+		return HttpResponseRedirect(reverse('blog:index'))
+
+	try: # should probably put this in Blocked info
+		block_user = User.objects.get(pk=request.POST['block_user'])
+		block_user.profile.blockedOrNot = True
+		block_user.profile.blocked_by = User.objects.get(pk=request.POST['user_id'])
+		block_user.profile.save()
+		
+		
+		try:
+			block_user.blocked_info.count += 1
+			block_user.blocked_info.blocked_at = timezone.now()
+			block_user.blocked_info.save()
+		except:
+			block_info = Blocked(user=block_user,count=1,blocked_at=timezone.now())
+			block_user.blocked_info = block_info
+			block_user.blocked_info.save()
+			block_user.save()		
+	except:
+		pass
+		
+	try: # TODO add modded by
+		mod_handle = request.POST['new_mod_handle']
+		mod_profile = Profile.objects.filter(handle=mod_handle)[0]
+		mod_profile.modOrNot = True
+		mod_profile.save()
+	except:
+		pass
+		
+	try: # TODO add unblocked by
+		unblock_handle = request.POST['unblock_user']
+		unblock_profile = Profile.objects.filter(handle=unblock_handle)[0]
+		unblock_profile.blockedOrNot = False
+		unblock_profile.save()
+	except:
+		pass
+	
+	try:
+		delete_q = request.POST['delete_q']
+		q = Question.objects.get(pk=delete_q)
+		q.blockedOrNot = True
+		q.blocked_by = User.objects.get(pk=request.POST['user_id'])
+		q.save()
+	except:
+		pass
+		
+	try:
+		hide_r = request.POST['hide_r']
+		r = Answer.objects.get(pk=hide_r)
+		r.blockedOrNot = True
+		r.blocked_by = User.objects.get(pk=request.POST['user_id'])
+		r.save()
 	except:
 		pass
 	

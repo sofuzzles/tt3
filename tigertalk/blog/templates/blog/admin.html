@@ -1,0 +1,78 @@
+{% if user.is_authenticated and user.profile.is_admin %}
+	<h1> Administrator home page </h1>
+	Currently logged in as {{user.profile.handle}}. <a href="/accounts/logout">Log out</a>
+	<a href="{% url 'blog:index' %}"> Home </a>
+	<h3> <a href="{% url 'blog:inappropriate_qs' %}">Questions marked inappropriate: </a></h3> <br>
+	<ul>
+		{% for question in inappropriate_questions %}
+			<li> {{ question.text }}	 Flag Count: {{question.inappropriateCount}} 
+					<form action="{% url 'blog:admin' %}" method="post">
+							{% csrf_token %}
+							<button name="delete_q" value="{{question.id}}"> Delete this question </button>
+							<input type="hidden" name="user_id" value="{{user.id}}">
+				  </form>
+			</li>
+		{% endfor %}
+	</ul>
+	<h3> <a href="{% url 'blog:inappropriate_rs' %}">Responses marked inappropriate: </a></h3> <br>
+	<ul>
+		{% for response in inappropriate_responses %}
+			<li> {{ response.text }}	 Flag Count: {{response.inappropriateCount}}  
+					<form action="{% url 'blog:admin' %}" method="post">
+							{% csrf_token %}
+							<button name="hide_r" value="{{response.id}}"> Hide this response </button>
+							<input type="hidden" name="user_id" value="{{user.id}}">
+					</form>
+			</li>
+		{% endfor %}
+	</ul>
+	<h3> <a href="{% url 'blog:flagged_users' %}"> Flagged users: </a></h3> <br>
+	<ul>
+		{% for profile in flagged_profiles %}
+			<li> {{ profile.handle }} Flag Count: {{ profile.inappropriateCount }} 
+				<form action="{% url 'blog:admin' %}" method="post">
+							{% csrf_token %}
+							<button name="block_user" value="{{profile.user.id}}"> Block this user </button>
+							<input type="hidden" name="user_id" value="{{user.id}}">
+					</form>
+			</li>
+		{% endfor %}
+	</ul>
+	<h3> Unblock a user: </h3>
+	<form action="{% url 'blog:admin' %}" method="post">
+		{% csrf_token %}
+		<input type="text" name="unblock_user" value="" placeholder="Write handle here">
+		<input type="hidden" name="user_id" value="{{user.id}}">
+		<input type="Submit" name="submit">
+	</form>
+	<h3> See a user's post history: </h3>
+	<form action="{% url 'blog:see_user_history' %}" method="get">
+		{% csrf_token %}
+		<input type="text" name="det_user" value="" placeholder="Write handle here">
+		<input type="hidden" name="user_id" value="{{user.id}}">
+		<input type="Submit" name="submit">
+	</form>
+	<h3> Add a new mod: </h3> 
+	<form action="{% url 'blog:admin' %}" method="post">
+		{% csrf_token %}
+		<input type="text" name="new_mod_handle" value="" placeholder="Write handle here">
+		<input type="hidden" name="user_id" value="{{user.id}}">
+		<input type="Submit" name="submit">
+	</form>
+	<h3> See a mod's action history: </h3>
+	<form action="{% url 'blog:see_mod_history' %}" method="get">
+		{% csrf_token %}
+		<input type="text" name="mod" value="" placeholder="Write handle here">
+		<input type="hidden" name="user_id" value="{{user.id}}">
+		<input type="Submit" name="submit">
+	</form>
+	<h3> Add a new admin: </h3> 
+	<form action="{% url 'blog:admin' %}" method="post">
+		{% csrf_token %}
+		<input type="text" name="new_admin_handle" value="" placeholder="Write handle here">
+		<input type="hidden" name="user_id" value="{{user.id}}">
+		<input type="Submit" name="submit">
+	</form>
+	
+	
+{% endif %}

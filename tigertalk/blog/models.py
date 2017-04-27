@@ -11,13 +11,16 @@ from . import managers
 class Profile(models.Model):
     # Relations
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    blocked_by = models.OneToOneField(User, blank=True, null=True, related_name = 'blocked_by')
     # Attributes - Mandatory
     initialized = models.BooleanField(default = False)
     handle = models.CharField(max_length = 50, blank=True)
     created_at = models.DateTimeField(null=True,blank=True)
     netid = models.CharField(max_length = 50, blank=True)
     modOrNot = models.BooleanField(default = False)
+    is_admin = models.BooleanField(default = False)
     blockedOrNot = models.BooleanField(default = False)
+    
     classYear = models.CharField(max_length = 10, blank=True)
     inappropriateCount = models.PositiveIntegerField(default=0)
     # Attributes - Optional
@@ -45,6 +48,7 @@ def create_user_profile(sender, **kwargs):
 # Question model
 class Question(models.Model):
     # Relations
+    blocked_by = models.OneToOneField(User, blank=True, null=True)
     # Attributes - Mandatory
     text = models.TextField()
     created_at = models.DateTimeField()
@@ -72,6 +76,7 @@ class Answer(models.Model):
     # Relations
     user = models.ForeignKey(User, related_name='answers')
     question = models.ForeignKey(Question, related_name='answers')
+    blocked_by = models.OneToOneField(User, blank=True, null=True)
     # Attributes - Mandatory
     text = models.TextField()
     created_at = models.DateTimeField()
