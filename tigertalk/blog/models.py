@@ -88,8 +88,8 @@ class Answer(models.Model):
         default=0,
         verbose_name = "Helpful")
     # Attributes - Optional
-    inappropriateId = models.ManyToManyField(User, related_name = 'helpful_responses')
-    helpfulId = models.ManyToManyField(User, related_name = 'inappropriate_responses')
+    inappropriateId = models.ManyToManyField(User, related_name = 'inappropriate_responses')
+    helpfulId = models.ManyToManyField(User, related_name = 'helpful_responses')
     # Object Manager
     objects = managers.AnswerManager()
     # Custom Properties
