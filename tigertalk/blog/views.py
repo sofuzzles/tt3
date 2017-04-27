@@ -119,7 +119,7 @@ def index(request):
 		'inapp_responses_list': inapp_responses_list, 
 	}
 
-	print(cur_page)
+	#print(cur_page)
 	return HttpResponse(template.render(context, request))
 
 
@@ -146,13 +146,19 @@ def filter(request):
 		if allowed:
 			allowed_question_list.append(q)
 	
-	allowed_question_list = allowed_question_list[:5]
 	template = loader.get_template('blog/index.html')
 	context = {
-		'latest_question_list' : allowed_question_list,
+		'questions' : allowed_question_list,
 		'expanded_question_list' : [], 
 		'response_question_list' : [], 
+		'user': request.user,
+		'flagged_question_list': [],
+		'expanded_answers': [],
+		'cur_page': 1,
+		'helpful_responses_list': [], 
+		'inapp_responses_list': [], 
 	}
+
 	return HttpResponse(template.render(context, request))
 
 def getq(request, question_id):

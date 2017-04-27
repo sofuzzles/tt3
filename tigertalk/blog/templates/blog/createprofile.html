@@ -1,16 +1,22 @@
-<h1>Create your TigerTalk Profile</h1
+{% if not user.profile.initialized and user.is_authenticated %}
+	<h1>Create your TigerTalk Profile</h1>
 
-<h3>Welcome to the pack! Enter the information below so you can start answering and voting on answers: </h3>
+	<h3>Welcome to the pack! Enter the information below so you can start answering and voting on answers: </h3>
 
-<form method="post" action="{% url 'blog:createprofile' %}">
-{% if handle_in_use %}
-This handle is already in use <br>
+	<form method="post" action="{% url 'blog:createprofile' %}">
+	{% if handle_in_use %}
+	This handle is already in use <br>
+	{% endif %}
+	{% csrf_token %}
+	Username (this will appear instead of your netID): <br>
+	<input type="text" name="handle"> <br>
+	Class Year (ex: 2017, G2017):<br>
+	<input type="text" name="year"> <br>
+	<input type="submit" value="Submit">
+
+	</form>
+{% elif user.profile.initialized and user.is_authenticated %}
+	You already have a profile. <a href="{% url 'blog:index' %}"> Return to home. </a>
+{% elif not user.is_authenticated %}
+	You have to <a href="{% url 'blog:loginpage' %}">log in</a> before creating a profile.
 {% endif %}
-{% csrf_token %}
-Username (this will appear instead of your netID): <br>
-<input type="text" name="handle"> <br>
-Class Year (ex: 2017, G2017):<br>
-<input type="text" name="year"> <br>
-<input type="submit" value="Submit">
-
-</form>

@@ -1,7 +1,7 @@
 <h1>TigerTalk</h1>
 
 {% if user.is_authenticated %}
-    <a href="/accounts/logout">Log out</a>
+    Currently logged in as {{user.profile.handle}}. <a href="/accounts/logout">Log out</a>
 {% else %}
     <form action="{% url 'blog:loginpage' %}" method="get">
             <button name="login" value="{{question.id}}">Click here to Log-in/Register</button>

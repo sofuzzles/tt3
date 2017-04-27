@@ -1,5 +1,6 @@
 {% if user.is_authenticated and user.profile.modOrNot %}
 	<h1> Moderator home page </h1>
+	Currently logged in as {{user.profile.handle}}. <a href="/accounts/logout">Log out</a>
 	<a href="{% url 'blog:index' %}"> Home </a>
 	<h3> <a href="{% url 'blog:inappropriate_qs' %}">Questions marked inappropriate: </a></h3> <br>
 	<ul>

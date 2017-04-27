@@ -1,4 +1,5 @@
 {% if user.is_authenticated and user.profile.modOrNot %}
+Currently logged in as {{user.profile.handle}}. <a href="/accounts/logout">Log out</a>
 
 <h1> {{det_user.profile.handle}}'s response history </h1>
 
