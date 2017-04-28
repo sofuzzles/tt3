@@ -281,20 +281,21 @@ def flagged_users(request):
 	
 	try:
 		block_user = User.objects.get(pk=request.POST['block_user'])
-		block_user.profile.blockedOrNot = True
-		block_user.profile.blocked_by = User.objects.get(pk=request.POST['user_id'])
-		block_user.profile.save()
-		block_user.save()
+		if not block_user.profile.modOrNot:
+			block_user.profile.blockedOrNot = True
+			block_user.profile.blocked_by = User.objects.get(pk=request.POST['user_id'])
+			block_user.profile.save()
+			block_user.save()
 		
-		try:
-			block_user.blocked_info.count += 1
-			block_user.blocked_info.blocked_at = timezone.now()
-			block_user.blocked_info.save()
-		except:
-			block_info = Blocked(user=block_user,count=1,blocked_at=timezone.now())
-			block_user.blocked_info = block_info
-			block_user.blocked_info.save()
-			block_user.save()		
+			try:
+				block_user.blocked_info.count += 1
+				block_user.blocked_info.blocked_at = timezone.now()
+				block_user.blocked_info.save()
+			except:
+				block_info = Blocked(user=block_user,count=1,blocked_at=timezone.now())
+				block_user.blocked_info = block_info
+				block_user.blocked_info.save()
+				block_user.save()		
 	except:
 		pass
 		
@@ -463,20 +464,20 @@ def mod(request):
 
 	try: # should probably put this in Blocked info
 		block_user = User.objects.get(pk=request.POST['block_user'])
-		block_user.profile.blockedOrNot = True
-		block_user.profile.blocked_by = User.objects.get(pk=request.POST['user_id'])
-		block_user.profile.save()
+		if not block_user.profile.modOrNot:
+			block_user.profile.blockedOrNot = True
+			block_user.profile.blocked_by = User.objects.get(pk=request.POST['user_id'])
+			block_user.profile.save()
 		
-		
-		try:
-			block_user.blocked_info.count += 1
-			block_user.blocked_info.blocked_at = timezone.now()
-			block_user.blocked_info.save()
-		except:
-			block_info = Blocked(user=block_user,count=1,blocked_at=timezone.now())
-			block_user.blocked_info = block_info
-			block_user.blocked_info.save()
-			block_user.save()		
+			try:
+				block_user.blocked_info.count += 1
+				block_user.blocked_info.blocked_at = timezone.now()
+				block_user.blocked_info.save()
+			except:
+				block_info = Blocked(user=block_user,count=1,blocked_at=timezone.now())
+				block_user.blocked_info = block_info
+				block_user.blocked_info.save()
+				block_user.save()		
 	except:
 		pass
 		
