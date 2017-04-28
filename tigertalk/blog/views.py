@@ -52,6 +52,20 @@ def index(request):
 	except:
 		pass
 
+	# unflag question
+	try:
+		unflagged_q = Question.objects.get(pk=request.POST['unflag_q'])
+		user  = request.user
+		unflagged_q.inappropriateCount -= 1
+		unflagged_q.inappropriateId.remove(user)
+		unflagged_q.save()
+		user.flagged_questions.remove(unflagged_q)
+		user.save()
+		
+		cur_page = request.GET['page']
+	except:
+		pass
+
 	# if user logged in, don't let them reflag question
 	try:
 		user  = request.user
@@ -210,6 +224,19 @@ def getq(request, question_id):
     except:
     	pass
 
+    # unflag question
+    try:
+    	unflagged_q = Question.objects.get(pk=request.POST['unflag_q'])
+    	user  = request.user
+    	unflagged_q.inappropriateCount -= 1
+    	unflagged_q.inappropriateId.remove(user)
+    	unflagged_q.save()
+    	user.flagged_questions.remove(unflagged_q)
+    	user.save()
+
+    except:
+    	pass
+    	
     # if user logged in, don't let them reflag question
     try:
     	user  = request.user

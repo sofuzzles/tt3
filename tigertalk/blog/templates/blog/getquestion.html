@@ -16,14 +16,20 @@
 <h2>{{ question.text }}</h2>
 
 {% if user.is_authenticated and not user.profile.blockedOrNot %}
-            {% if question in flagged_question_list %}
+             {% if question in flagged_question_list %}
                 You have flagged this question <br>
-            {% else %}
-                <form action="{% url 'blog:index' %}" method="post">
+                    <form action="{% url 'blog:questions' question.id %}" method="post">
                         {% csrf_token %}
-                        <button name="flag_q" value="{{question.id}}">Flag this question as inappropriate</button>
+                        <button name="unflag_q" value="{{question.id}}">Un-flag this question as inappropriate</button>
                         <input type="hidden" name="user_id" value="{{user.id}}">
                         <input type="hidden" name="page" value="{{page_number}}">
+                    </form>
+            {% else %}
+                <form action="{% url 'blog:questions' question.id %}" method="post">
+                    {% csrf_token %}
+                        <button name="flag_q" value="{{question.id}}">Flag this question as inappropriate</button>
+                        <input type="hidden" name="user_id" value="{{user.id}}">
+            <input type="hidden" name="page" value="{{page_number}}">
                 </form>
             {% endif %}
         {% endif %}
@@ -41,24 +47,24 @@
   {% if user.is_authenticated and not user.profile.blockedOrNot %}
                     {% if answer in helpful_responses_list %}
                         You have already marked this answer as helpful <br>
-                        <form action="{% url 'blog:index' %}" method="get">
+                        <form action="{% url 'blog:questions' question.id %}" method="get">
                             <button name="unhelpful" value="{{answer.id}}">Un-mark this response as helpful</button>
                             <input type="hidden" name="user_id" value="{{user.id}}">
                         </form>
                     {% else %}
-                         <form action="{% url 'blog:index' %}" method="get">
+                         <form action="{% url 'blog:questions' question.id %}" method="get">
                             <button name="helpful" value="{{answer.id}}">Mark this response as helpful</button>
                             <input type="hidden" name="user_id" value="{{user.id}}">
                         </form>
                     {% endif %}
                     {% if answer in inapp_responses_list %}
                         You have already flagged this answer as inappropriate <br>
-                           <form action="{% url 'blog:index' %}" method="get">
+                           <form action="{% url 'blog:questions' question.id %}" method="get">
                                <button name="uninapp" value="{{answer.id}}">Un-flag this response as innapropriate</button>
                                <input type="hidden" name="user_id" value="{{user.id}}">
                           </form>
                     {% else %}
-                          <form action="{% url 'blog:index' %}" method="get">
+                          <form action="{% url 'blog:questions' question.id %}" method="get">
                                <button name="inapp" value="{{answer.id}}">Flag this response as innapropriate</button>
                                <input type="hidden" name="user_id" value="{{user.id}}">
                           </form>
