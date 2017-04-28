@@ -81,7 +81,7 @@ def index(request):
 	except: 
 		helpful_responses_list = []
 
-	# response flagging 
+	#response flagging 
 	try:
 		inapp_answer = Answer.objects.get(pk=request.GET['inapp'])
 		user = request.user
@@ -231,6 +231,35 @@ def createprofile(request):
 		return HttpResponseRedirect(reverse("blog:index"))
 
 	template = loader.get_template('blog/createprofile.html')
+	context = {'handle_in_use': handle_in_use,}
+	return HttpResponse(template.render(context, request))
+
+def editprofile(request):
+	handle_in_use = 0
+	if request.method == 'POST':
+		user = request.user
+		netidtxt = user.username
+		handle = request.POST['handle']
+		handle_in_use = 0
+		for profile_obj in Profile.objects.all():
+			if handle == profile_obj.handle:
+				handle_in_use = 1
+				context = {'handle_in_use': handle_in_use,}
+				template = loader.get_template('blog/editprofile.html')
+				return HttpResponse(template.render(context, request))
+
+		user.profile.handle = handle 
+		user.profile.handle = request.POST['handle']
+		user.profile.classYear = request.POST['year']
+		user.profile.initialized = True
+		user.profile.netid = netidtxt
+		user.profile.created_at = timezone.now()
+		user.profile.save()
+		user.save()
+
+		return HttpResponseRedirect(reverse("blog:index"))
+
+	template = loader.get_template('blog/editprofile.html')
 	context = {'handle_in_use': handle_in_use,}
 	return HttpResponse(template.render(context, request))
     
