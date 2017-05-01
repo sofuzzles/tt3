@@ -52,6 +52,20 @@ def index(request):
 	except:
 		pass
 
+	# unflag question
+	try:
+		unflagged_q = Question.objects.get(pk=request.POST['unflag_q'])
+		user  = request.user
+		unflagged_q.inappropriateCount -= 1
+		unflagged_q.inappropriateId.remove(user)
+		unflagged_q.save()
+		user.flagged_questions.remove(unflagged_q)
+		user.save()
+		
+		cur_page = request.GET['page']
+	except:
+		pass
+
 	# if user logged in, don't let them reflag question
 	try:
 		user  = request.user
@@ -81,6 +95,21 @@ def index(request):
 	except: 
 		helpful_responses_list = []
 
+	# un mark response as helpful
+
+	try:
+		unhelpful_answer = Answer.objects.get(pk=request.GET['unhelpful'])
+		user = request.user
+		unhelpful_answer.helpfulCount -= 1
+		unhelpful_answer.helpfulId.remove(user)
+		unhelpful_answer.save()
+
+		user.helpful_responses.remove(unhelpful_answer)
+		user.save()
+
+	except: 
+		pass
+
 	#response flagging 
 	try:
 		inapp_answer = Answer.objects.get(pk=request.GET['inapp'])
@@ -103,6 +132,24 @@ def index(request):
 		inapp_responses_list = user.inappropriate_responses.all()
 	except:
 		inapp_responses_list = []
+
+	# unflag as inappropriate
+
+	try:
+		un_inapp_answer = Answer.objects.get(pk=request.GET['uninapp'])
+		user = request.user
+		un_inapp_answer.inappropriateCount -= 1
+		un_inapp_answer.inappropriateId.remove(user)
+		un_inapp_answer.save()
+
+		un_inapp_answer.user.inappropriateCount -= 1
+		un_inapp_answer.user.save()
+
+		user.inappropriate_responses.remove(un_inapp_answer)
+		user.save()
+	
+	except:
+		pass
 	
 	template = loader.get_template('blog/index.html')
 	context = {
@@ -163,7 +210,127 @@ def getq(request, question_id):
         question = Question.objects.get(pk=question_id)
     except Question.DoesNotExist:
         raise Http404("Question does not exist")
-    return render(request, 'blog/getquestion.html', {'question': question})
+
+	# questions the user flagged
+    try:
+    	flagged_q = Question.objects.get(pk=request.POST['flag_q'])
+    	user  = request.user
+    	flagged_q.inappropriateCount += 1
+    	flagged_q.inappropriateId.add(user)
+    	flagged_q.save()
+    	user.flagged_questions.add(flagged_q)
+    	user.save()
+
+    except:
+    	pass
+
+    # unflag question
+    try:
+    	unflagged_q = Question.objects.get(pk=request.POST['unflag_q'])
+    	user  = request.user
+    	unflagged_q.inappropriateCount -= 1
+    	unflagged_q.inappropriateId.remove(user)
+    	unflagged_q.save()
+    	user.flagged_questions.remove(unflagged_q)
+    	user.save()
+
+    except:
+    	pass
+    	
+    # if user logged in, don't let them reflag question
+    try:
+    	user  = request.user
+    	flagged_question_list = user.flagged_questions.all()
+    except:
+    	flagged_question_list = []
+
+    # mark response as helpful
+    try:
+    	helpful_answer = Answer.objects.get(pk=request.GET['helpful'])
+    	user = request.user
+    	helpful_answer.helpfulCount += 1
+    	helpful_answer.helpfulId.add(user)
+    	helpful_answer.save()
+
+    	user.helpful_responses.add(helpful_answer)
+    	user.save()
+
+    except: 
+    	pass
+
+    #no double flagging
+    try:
+    	user = request.user
+    	helpful_responses_list = user.helpful_responses.all()
+    except: 
+    	helpful_responses_list = []
+
+    # un mark response as helpful
+
+    try:
+    	unhelpful_answer = Answer.objects.get(pk=request.GET['unhelpful'])
+    	user = request.user
+    	unhelpful_answer.helpfulCount -= 1
+    	unhelpful_answer.helpfulId.remove(user)
+    	unhelpful_answer.save()
+
+    	user.helpful_responses.remove(unhelpful_answer)
+    	user.save()
+
+    except: 
+    	pass
+
+    #response flagging 
+    try:
+    	inapp_answer = Answer.objects.get(pk=request.GET['inapp'])
+    	user = request.user
+    	inapp_answer.inappropriateCount += 1
+    	inapp_answer.inappropriateId.add(user)
+    	inapp_answer.save()
+
+    	inapp_answer.user.inappropriateCount += 1
+    	inapp_answer.user.save()
+
+    	user.inappropriate_responses.add(inapp_answer)
+    	user.save()
+
+    except:
+    	pass
+
+    try:
+    	user = request.user
+    	inapp_responses_list = user.inappropriate_responses.all()
+    except:
+    	inapp_responses_list = []
+
+    # unflag as inappropriate
+
+    try:
+    	un_inapp_answer = Answer.objects.get(pk=request.GET['uninapp'])
+    	user = request.user
+    	un_inapp_answer.inappropriateCount -= 1
+    	un_inapp_answer.inappropriateId.remove(user)
+    	un_inapp_answer.save()
+
+    	un_inapp_answer.user.inappropriateCount -= 1
+    	un_inapp_answer.user.save()
+
+    	user.inappropriate_responses.remove(un_inapp_answer)
+    	user.save()
+
+    except:
+    	pass
+
+    template = loader.get_template('blog/getquestion.html')
+    context = {
+    	'question': question,
+    	'user': request.user,
+    	'flagged_question_list': flagged_question_list,
+    	'helpful_responses_list': helpful_responses_list, 
+    	'inapp_responses_list': inapp_responses_list, 
+    	}
+
+    return HttpResponse(template.render(context, request))
 
 def postaq(request):
 	if request.method == 'GET':
