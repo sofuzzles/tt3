@@ -118,7 +118,8 @@ def index(request):
 		inapp_answer.inappropriateId.add(user)
 		inapp_answer.save()
 
-		inapp_answer.user.inappropriateCount += 1
+		inapp_answer.user.profile.inappropriateCount += 1
+		inapp_answer.user.profile.save()
 		inapp_answer.user.save()
 
 		user.inappropriate_responses.add(inapp_answer)
