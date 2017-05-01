@@ -2,6 +2,7 @@
 
 {% if user.is_authenticated %}
     Currently logged in as {{user.profile.handle}}. <a href="/accounts/logout">Log out</a>
+    <a href="{% url 'blog:editprofile' %}">edit profile</a>
 {% else %}
     <form action="{% url 'blog:loginpage' %}" method="get">
             <button name="login" value="{{question.id}}">Click here to Log-in/Register</button>
@@ -54,8 +55,7 @@ Filter by tag:
         {% if question in expanded_question_list %}
         	<ul>
         	{% for answer in expanded_answers %}
-        		 {% if user.is_authenticated and not user.profile.blockedOrNot %}
-     
+        		{% if user.is_authenticated and not user.profile.blockedOrNot %}
                     {% if answer in helpful_responses_list %}
                         You have already marked this answer as helpful <br>
                     {% else %}
@@ -71,14 +71,15 @@ Filter by tag:
                                <button name="inapp" value="{{answer.id}}">Flag this response as innapropriate</button>
                                <input type="hidden" name="user_id" value="{{user.id}}">
                           </form>
-                	{% endif %}
+                    {% endif %}
                 {% endif %}
-        		<li>{{answer.text}} - {{answer.user.profile.handle}}</li>
+		        <li>{{answer.text}} - {{answer.user.profile.handle}}</li>
                 <li> Helpful Count is {{answer.helpfulCount}} </li> 
             	<li> Inappropriate Count is {{answer.inappropriateCount}} </li> 
         	{% empty %}
         		No answers, lol, sorry.
         	{% endfor %}
+		<form action="{% url 'blog:getquestion'%}{{question.id}}" method="get">
         	</ul>
 	
         	<form action="{% url 'blog:index' %}#resp_results{{question.id}}" method="get">

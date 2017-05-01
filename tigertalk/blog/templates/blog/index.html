@@ -1,3 +1,6 @@
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
 <h1>TigerTalk</h1>
 
 {% if user.is_authenticated %}
@@ -79,6 +82,7 @@ Filter by tag:
         	{% empty %}
         		No answers, lol, sorry.
         	{% endfor %}
+		<form action="{% url 'blog:getquestion'%}{{question.id}}" method="get">
         	</ul>
 	
         	<form action="{% url 'blog:index' %}#resp_results{{question.id}}" method="get">
