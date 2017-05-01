@@ -118,7 +118,8 @@ def index(request):
 		inapp_answer.inappropriateId.add(user)
 		inapp_answer.save()
 
-		inapp_answer.user.inappropriateCount += 1
+		inapp_answer.user.profile.inappropriateCount += 1
+		inapp_answer.user.profile.save()
 		inapp_answer.user.save()
 
 		user.inappropriate_responses.add(inapp_answer)
@@ -142,7 +143,8 @@ def index(request):
 		un_inapp_answer.inappropriateId.remove(user)
 		un_inapp_answer.save()
 
-		un_inapp_answer.user.inappropriateCount -= 1
+		un_inapp_answer.user.profile.inappropriateCount -= 1
+		un_inapp_answer.user.profile.save()
 		un_inapp_answer.user.save()
 
 		user.inappropriate_responses.remove(un_inapp_answer)
@@ -288,8 +290,9 @@ def getq(request, question_id):
     	inapp_answer.inappropriateId.add(user)
     	inapp_answer.save()
 
-    	inapp_answer.user.inappropriateCount += 1
-    	inapp_answer.user.save()
+    	inapp_answer.user.profile.inappropriateCount += 1
+    	inapp_answer.user.profile.save()
+	inapp_answer.user.save()
 
     	user.inappropriate_responses.add(inapp_answer)
     	user.save()
@@ -312,8 +315,9 @@ def getq(request, question_id):
     	un_inapp_answer.inappropriateId.remove(user)
     	un_inapp_answer.save()
 
-    	un_inapp_answer.user.inappropriateCount -= 1
-    	un_inapp_answer.user.save()
+    	un_inapp_answer.user.profile.inappropriateCount -= 1
+    	un_inapp_answer.user.profile.save()
+	un_inapp_answer.user.save()
 
     	user.inappropriate_responses.remove(un_inapp_answer)
     	user.save()

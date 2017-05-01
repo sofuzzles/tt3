@@ -1,7 +1,31 @@
+{% load staticfiles %}
+<<<<<<< HEAD
+<html>
+    <head>
 <h1>TigerTalk</h1>
+ <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="{% static 'css/blog.css' %}">
+=======
 
+<html>
+<head>
+<title>TigerTalk</title>
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+<link href='//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="{% static 'css/blog.css' %}">
+</head>
+
+</body>
+<div class="page-header">
+<h1><a href="/">TigerTalk</a></h1>
+</div>
+
+>>>>>>> 53251f7756f3adbea864f68d3f2b1a6b70396e49
 {% if user.is_authenticated %}
     Currently logged in as {{user.profile.handle}}. <a href="/accounts/logout">Log out</a>
+    <a href="{% url 'blog:editprofile' %}">edit profile</a>
 {% else %}
     <form action="{% url 'blog:loginpage' %}" method="get">
             <button name="login" value="{{question.id}}">Click here to Log-in/Register</button>
@@ -36,6 +60,12 @@ Filter by tag:
         {% if user.is_authenticated and not user.profile.blockedOrNot %}
             {% if question in flagged_question_list %}
                 You have flagged this question <br>
+                    <form action="{% url 'blog:index' %}" method="post">
+                        {% csrf_token %}
+                        <button name="unflag_q" value="{{question.id}}">Un-flag this question as inappropriate</button>
+                        <input type="hidden" name="user_id" value="{{user.id}}">
+                        <input type="hidden" name="page" value="{{page_number}}">
+                    </form>
             {% else %}
                 <form action="{% url 'blog:index' %}" method="post">
                 		{% csrf_token %}
@@ -54,26 +84,37 @@ Filter by tag:
         {% if question in expanded_question_list %}
         	<ul>
         	{% for answer in expanded_answers %}
-        		 {% if user.is_authenticated and not user.profile.blockedOrNot %}
-     
+        		{% if user.is_authenticated and not user.profile.blockedOrNot %}
                     {% if answer in helpful_responses_list %}
                         You have already marked this answer as helpful <br>
+                        <form action="{% url 'blog:index' %}" method="get">
+                        {% csrf_token %}
+                            <button name="unhelpful" value="{{answer.id}}">Un-mark this response as helpful</button>
+                            <input type="hidden" name="user_id" value="{{user.id}}">
+                        </form>
                     {% else %}
                          <form action="{% url 'blog:index' %}" method="get">
+                         {% csrf_token %}
                             <button name="helpful" value="{{answer.id}}">Mark this response as helpful</button>
                             <input type="hidden" name="user_id" value="{{user.id}}">
                         </form>
                     {% endif %}
                     {% if answer in inapp_responses_list %}
                         You have already flagged this answer as inappropriate <br>
+                           <form action="{% url 'blog:index' %}" method="get">
+                           {% csrf_token %}
+                               <button name="uninapp" value="{{answer.id}}">Un-flag this response as innapropriate</button>
+                               <input type="hidden" name="user_id" value="{{user.id}}">
+                          </form>
                     {% else %}
                           <form action="{% url 'blog:index' %}" method="get">
+                          {% csrf_token %}
                                <button name="inapp" value="{{answer.id}}">Flag this response as innapropriate</button>
                                <input type="hidden" name="user_id" value="{{user.id}}">
                           </form>
-                	{% endif %}
+                    {% endif %}
                 {% endif %}
-        		<li>{{answer.text}} - {{answer.user.profile.handle}}</li>
+		        <li>{{answer.text}} - {{answer.user.profile.handle}}</li>
                 <li> Helpful Count is {{answer.helpfulCount}} </li> 
             	<li> Inappropriate Count is {{answer.inappropriateCount}} </li> 
         	{% empty %}
@@ -117,4 +158,7 @@ Filter by tag:
 </div>
 {% endfor %}
 {% show_pages %}
+ </head>
+ </html>
 
+</html>
