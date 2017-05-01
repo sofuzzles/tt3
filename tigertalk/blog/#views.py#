@@ -118,8 +118,7 @@ def index(request):
 		inapp_answer.inappropriateId.add(user)
 		inapp_answer.save()
 
-		inapp_answer.user.profile.inappropriateCount += 1
-		inapp_answer.user.profile.save()
+		inapp_answer.user.inappropriateCount += 1
 		inapp_answer.user.save()
 
 		user.inappropriate_responses.add(inapp_answer)
@@ -432,7 +431,7 @@ def editprofile(request):
 	return HttpResponse(template.render(context, request))
     
 def inappropriate_qs(request):
-	if not request.user.is_authenticated or not request.user.profile.modOrNot:
+	if not request.user.is_authenticated or not request.user.profile.modrNot:
 		return HttpResponseRedirect(reverse('blog:index'))
 	try:
 		delete_q = request.POST['delete_q']
