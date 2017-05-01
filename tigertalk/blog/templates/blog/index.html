@@ -100,7 +100,6 @@ Filter by tag:
         	{% empty %}
         		No answers, lol, sorry.
         	{% endfor %}
-		<form action="{% url 'blog:getquestion'%}{{question.id}}" method="get">
         	</ul>
 	
         	<form action="{% url 'blog:index' %}#resp_results{{question.id}}" method="get">
