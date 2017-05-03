@@ -19,4 +19,5 @@ urlpatterns = [
 	url(r'see_user_history/', views.see_user_history, name='see_user_history'),
 	url(r'admin/', views.admin, name='admin'),
 	url(r'see_mod_history/', views.see_mod_history, name='see_mod_history'),
+    url(r'^(?P<tag_text>.+)/$', views.filtertag, name='filtertag'),
 ]

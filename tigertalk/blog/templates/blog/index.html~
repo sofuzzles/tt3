@@ -1,13 +1,3 @@
-{% load staticfiles %}
-<<<<<<< HEAD
-<html>
-    <head>
-<h1>TigerTalk</h1>
- <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-        <link rel="stylesheet" href="{% static 'css/blog.css' %}">
-=======
-
 <html>
 <head>
 <title>TigerTalk</title>
@@ -22,7 +12,7 @@
 <h1><a href="/">TigerTalk</a></h1>
 </div>
 
->>>>>>> 53251f7756f3adbea864f68d3f2b1a6b70396e49
+
 {% if user.is_authenticated %}
     Currently logged in as {{user.profile.handle}}. <a href="/accounts/logout">Log out</a>
     <a href="{% url 'blog:editprofile' %}">edit profile</a>

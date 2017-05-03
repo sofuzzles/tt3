@@ -20,16 +20,20 @@ def index(request):
 		cur_page = request.GET['page']
 		expanded_question_list = [exp_question]
 		exp_answers = expanded_question_list[0].answers.order_by('helpfulCount', '-created_at')[:5]
+		top_answer = exp_answers[0]
 	except (KeyError, Question.DoesNotExist):
 		expanded_question_list = []
 		exp_answers = []
 		cur_page = utils.get_page_number_from_request(request)
+		top_answer = ''
+	
 	try:
 		res_question = Question.objects.get(pk=request.GET['respond_to_q'])
 		cur_page = request.GET['page']
 		response_question_list = [res_question]
 	except (KeyError, Question.DoesNotExist):
 		response_question_list = []
+	
 	try: 
 		close_q = Question.objects.get(pk=request.GET['close_requested'])
 		expanded_question_list= []
@@ -179,7 +183,7 @@ def update_responses(request):
 	return HttpResponseRedirect(reverse("blog:index"))
 
 def filter(request):
-	search_tags = request.GET['tags'].split()
+	search_tags = request.GET.get('tags').split()
 	latest_question_list = Question.objects.order_by('-created_at')
 	allowed_question_list = []
 	for q in latest_question_list:
@@ -188,6 +192,35 @@ def filter(request):
 			if not q.tags.filter(text__iregex = t):
 				allowed = False
 				break
+		
+		if allowed:
+			allowed_question_list.append(q)
+	
+	template = loader.get_template('blog/index.html')
+	context = {
+		'questions' : allowed_question_list,
+		'expanded_question_list' : [], 
+		'response_question_list' : [], 
+		'user': request.user,
+		'flagged_question_list': [],
+		'expanded_answers': [],
+		'cur_page': 1,
+		'helpful_responses_list': [], 
+		'inapp_responses_list': [], 
+	}
+
+	return HttpResponse(template.render(context, request))
+
+def filtertag(request, tag_text):
+	txt = tag_text
+	print(txt)
+	latest_question_list = Question.objects.order_by('-created_at')
+	allowed_question_list = []
+	for q in latest_question_list:
+		print(q.text)
+		allowed = True
+		if not q.tags.filter(text__iregex = txt):
+				allowed = False
 		
 		if allowed:
 			allowed_question_list.append(q)
@@ -292,7 +325,6 @@ def getq(request, question_id):
 
     	inapp_answer.user.profile.inappropriateCount += 1
     	inapp_answer.user.profile.save()
-	inapp_answer.user.save()
 
     	user.inappropriate_responses.add(inapp_answer)
     	user.save()
@@ -317,7 +349,6 @@ def getq(request, question_id):
 
     	un_inapp_answer.user.profile.inappropriateCount -= 1
     	un_inapp_answer.user.profile.save()
-	un_inapp_answer.user.save()
 
     	user.inappropriate_responses.remove(un_inapp_answer)
     	user.save()

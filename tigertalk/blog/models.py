@@ -23,6 +23,7 @@ class Profile(models.Model):
     
     classYear = models.CharField(max_length = 10, blank=True)
     inappropriateCount = models.PositiveIntegerField(default=0)
+
     # Attributes - Optional
     # Object Manager
     objects = managers.ProfileManager()
@@ -69,6 +70,10 @@ class Question(models.Model):
         
     def __str__(self):
         return self.text
+ 
+    def top_answers(self):
+        return self.answers.order_by('-helpfulCount')
+         
 
 
 # Answer model
@@ -132,6 +137,9 @@ class Tag(models.Model):
         
     def __str__(self):
         return self.text
+
+    def getStringField(self):
+        return str(self.text)
 
 # Blocked user list
 class Blocked(models.Model):
