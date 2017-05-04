@@ -1,87 +1,263 @@
-<h1>TigerTalk</h1>
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% if user.is_authenticated %}
-    <a href="/accounts/logout">Log out</a>
-{% else %}
-    <form action="{% url 'blog:loginpage' %}" method="get">
-            <button name="login" value="{{question.id}}">Click here to Log-in/Register</button>
-    </form>
-{% endif %}
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-<br>
-<br>
-<a href="{% url 'blog:index' %}">Back to All Questions</a>
-<br><br>
+    <title>TigerTalk</title>
 
-<h2>{{ question.text }}</h2>
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
 
-{% if user.is_authenticated and not user.profile.blockedOrNot %}
-             {% if question in flagged_question_list %}
-                You have flagged this question <br>
-                    <form action="{% url 'blog:questions' question.id %}" method="post">
-                        {% csrf_token %}
-                        <button name="unflag_q" value="{{question.id}}">Un-flag this question as inappropriate</button>
-                        <input type="hidden" name="user_id" value="{{user.id}}">
-                        <input type="hidden" name="page" value="{{page_number}}">
-                    </form>
-            {% else %}
-                <form action="{% url 'blog:questions' question.id %}" method="post">
-                    {% csrf_token %}
-                        <button name="flag_q" value="{{question.id}}">Flag this question as inappropriate</button>
-                        <input type="hidden" name="user_id" value="{{user.id}}">
-            <input type="hidden" name="page" value="{{page_number}}">
-                </form>
-            {% endif %}
-        {% endif %}
-        {% for tag in question.tags.all %}
-                <ul>
-                        <li>Tag: {{tag.text}}</li>
-                </ul>
-        {% endfor %}
+    <!-- Theme CSS -->
+    <link href="{% static 'css/clean-blog.css' %}" rel="stylesheet">
 
+    <!-- Custom Fonts -->
+    <link href="{% static 'vendor/font-awesome/css/font-awesome.mincss' %}" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
 
-<ul>
-{% load el_pagination_tags %}
-{% paginate question.answers.all as answers %}
-{% for answer in answers %}
-  {% if user.is_authenticated and not user.profile.blockedOrNot %}
-                    {% if answer in helpful_responses_list %}
-                        You have already marked this answer as helpful <br>
-                        <form action="{% url 'blog:questions' question.id %}" method="get">
-                            <button name="unhelpful" value="{{answer.id}}">Un-mark this response as helpful</button>
-                            <input type="hidden" name="user_id" value="{{user.id}}">
-                        </form>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+  <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    Menu <i class="fa fa-bars"></i>
+                </button>
+
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                
+                <ul class="nav navbar-nav navbar-left">
+                <li>
+                    <a href="index.html">
+                    {% if user.is_authenticated %}
+                        Currently logged in as {{user.profile.handle}}. </a>
+                        <li>
+                        <a href="/accounts/logout">Log out</a>
+                        </li>
+                
                     {% else %}
+
+                    <a href="{% url 'blog:loginpage' %}">Click here to Log-in/Register</a>
+                    {% endif %}
+                    </li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+
+                    <li>
+                        <a href="{% url 'blog:postaq' %}">Post a question</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'blog:index' %}">Home</a>
+                    </li>
+                    <li>
+                          <form action="{% url 'blog:filter' %}" method="get">
+                            <input type="text" name="tags" placeholder="#COS #Kintali" value="">
+                            <input type="submit" value=" Search by tag">
+                        </form>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('{% static "img/home-bg.jpg"%}')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h1>{{question.text}}</h1>
+                        <hr class="small">
+                        {% for tag in question.tags.all %}
+                          <a class="tag" href="{% url 'blog:filtertag' tag.text %}">
+                             {{tag.text}}
+                          </a>
+                        {% endfor %}
+                        <hr class="small">
+                        {% if user.is_authenticated and not user.profile.blockedOrNot %}
+                          {% if question in flagged_question_list %}
+                            <form action="{% url 'blog:questions' question.id %}" method="post">
+                                {% csrf_token %}
+                                <button class="headerbtn" name="unflag_q" value="{{question.id}}">Unflag this question as inappropriate</button>
+                                <input type="hidden" name="user_id" value="{{user.id}}">
+                                <input type="hidden" name="page" value="{{page_number}}">
+                            </form>
+                          {% else %}
+                            <form action="{% url 'blog:questions' question.id %}" method="post">
+                                {% csrf_token %}
+                                    <button class="headerbtn" name="flag_q" value="{{question.id}}">Flag this question as inappropriate</button>
+                                    <input type="hidden" name="user_id" value="{{user.id}}">
+                                    <input type="hidden" name="page" value="{{page_number}}">
+                            </form>
+                          {% endif %}
+                        {% endif %}
+                        {% if user.is_authenticated and not user.profile.blockedOrNot %}
+                          <script>
+                            function add_input(btn) {
+                              var br = document.createElement("br")
+                              btn.parentNode.insertBefore(br, btn);
+
+                              var tb = document.createElement("textarea");
+                              tb.setAttribute("type", "text");
+                              tb.setAttribute("name", "response");
+                              tb.setAttribute("rows", "7");
+                              tb.setAttribute("style", "width:100%");
+                              tb.setAttribute("placeholder", "Enter a response...");
+                              btn.parentNode.insertBefore(tb, btn); 
+
+                              var hid1 = document.createElement("input");
+                              hid1.setAttribute("type", "hidden");
+                              hid1.setAttribute("name", "question_id")
+                              hid1.setAttribute("name", "{{question.id}}")
+                              btn.parentNode.insertBefore(hid1, btn); 
+
+                              var hid2 = document.createElement("input");
+                              hid2.setAttribute("type", "hidden");
+                              hid2.setAttribute("name", "user_id");
+                              hid2.setAttribute("value", "{{user.id}}");
+                              btn.parentNode.insertBefore(hid2, btn); 
+
+                              var hid3 = document.createElement("input");
+                              hid3.setAttribute("type", "hidden");
+                              hid3.setAttribute("name", "page");
+                              hid3.setAttribute("value", "{{page_number}}");
+                              btn.parentNode.insertBefore(hid3, btn); 
+
+                              var submit = document.createElement("input");
+                              submit.setAttribute("type", "submit");
+                              submit.setAttribute("value", "Submit");
+                              btn.parentNode.insertBefore(submit, btn); 
+                              btn.parentNode.removeChild(btn);
+                            }
+                          </script>
+                        {% else %}
+                          <script>
+                            function add_input(btn) {
+                              var tb = document.createElement("button");
+                              tb.setAttribute("name", "login");
+                              tb.setAttribute("value", "{{question.id}}");
+                              tb.innerHTML = "Please log in to answer a question";
+                              btn.parentNode.insertBefore(tb, btn); 
+                              btn.parentNode.removeChild(btn);
+                            }
+                          </script>
+                        {% endif %}
+                        {% if user.is_authenticated and not user.profile.blockedOrNot %}
+                        <form method="post" action="{% url 'blog:update_responses' %}#resp_results{{question.id}}">
+                          {% csrf_token %}
+                            <input type="button" class="headerbtn" id="btn" value="Submit a response" onclick="add_input(btn)">
+                        </form>
+                        {% else %}
+                        <form action="{% url 'blog:loginpage' %}" method="get">
+                          <button class="headerbtn" name="login" value="{{question.id}}">Please log in to respond</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a href="{% url 'blog:index' %}" class="inimage">Back to all questions</a>
+    </header>
+
+<!-- Main Content -->
+    {% load el_pagination_tags %}
+    {% paginate question.answers.all as answers %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                {% for answer in answers %}
+                {% show_current_number as page_number %}
+                <div class="post-preview">
+                    
+                    <h3 class="post-title">
+                        <i class="usersays">{{answer.user.profile.handle}} says </i>{{ answer.text }}
+                    </h3>
+                    
+                    <p>
+                        {% if answer.helpfuCount == 1 %} 
+                          {{answer.helpfulCount}} Princeton student found this useful
+                        {% else %}
+                          {{answer.helpfulCount}} Princeton students found this useful
+                        {% endif %}
+                    </p>
+                    </div>
+                    <!-- <ul class="pager"> -->
+                    <!-- <li class="pull-left"> -->
+                    <div id="outer">
+                    {% if user.is_authenticated and not user.profile.blockedOrNot %}
+                            {% if answer in helpful_responses_list %}
+                        <div class="inner">
+                          <form action="{% url 'blog:questions' question.id %}" method="get">
+                            <button class="resbtn" name="unhelpful" value="{{answer.id}}">unmark as helpful</button>
+                            <input type="hidden" name="user_id" value="{{user.id}}">
+                          </form>
+                        </div>
+                    {% else %}
+                        <div class="inner">
                          <form action="{% url 'blog:questions' question.id %}" method="get">
-                            <button name="helpful" value="{{answer.id}}">Mark this response as helpful</button>
+                            <button class="resbtn" name="helpful" value="{{answer.id}}">helpful?</button>
                             <input type="hidden" name="user_id" value="{{user.id}}">
                         </form>
+                      </div>
                     {% endif %}
                     {% if answer in inapp_responses_list %}
-                        You have already flagged this answer as inappropriate <br>
+                          <div class="inner">
                            <form action="{% url 'blog:questions' question.id %}" method="get">
-                               <button name="uninapp" value="{{answer.id}}">Un-flag this response as innapropriate</button>
+                               <button class="resbtn" name="uninapp" value="{{answer.id}}">unflag</button>
                                <input type="hidden" name="user_id" value="{{user.id}}">
                           </form>
+                        </div>
                     {% else %}
+                        <div class="inner">
                           <form action="{% url 'blog:questions' question.id %}" method="get">
-                               <button name="inapp" value="{{answer.id}}">Flag this response as innapropriate</button>
+                               <button class="resbtn" name="inapp" value="{{answer.id}}">inappropriate?</button>
                                <input type="hidden" name="user_id" value="{{user.id}}">
                           </form>
+                        </div>
                     {% endif %}
-                {% endif %}
-                <li>{{answer.text}} - {{answer.user.profile.handle}}</li>
-                <li> Helpful Count is {{answer.helpfulCount}} </li> 
-                <li> Inappropriate Count is {{answer.inappropriateCount}} </li> 
-{% empty %}
-     No answers, lol, sorry.
-{% endfor %}
-{% show_pages %}
+                        {% endif %} 
+                    <!-- </li> -->
+                    <!-- </ul> -->
+                  </div>
+                      <p class="postedat">Posted at {{ answer.created_at }}</p>
+    
+                <hr>
+                {% endfor %}
+                {% show_pages %}
+            </div>
+        </div>
+    </div>
+<ul>
+
 </ul>
-{% if user.is_authenticated and not user.profile.blockedOrNot %}
+<!-- {% if user.is_authenticated and not user.profile.blockedOrNot %}
 <form method="post" action="{% url 'blog:update_responses' %}#resp_results{{question.id}}">
 {% csrf_token %}
-<textarea type="text" name="response" rows="7" style="width:100%" placeholder="Enter your response..."></textarea>
+<textarea type="text" name="response" rows="7" style="width:100%" placeholder="Enter a response..."></textarea>
 <input type="hidden" name="question_id" value="{{question.id}}">
 <input type="submit" value="Submit">
 <input type="hidden" name="user_id" value="{{user.id}}">
@@ -91,5 +267,5 @@
 <form action="{% url 'blog:loginpage' %}" method="get">
 <button name="login" value="{{question.id}}">Please Login to Answer a Question</button>
 </form>
-{% endif %}
+{% endif %} -->
 

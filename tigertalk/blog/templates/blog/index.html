@@ -10,7 +10,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Tiger Talk</title>
+    <title>TigerTalk</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
@@ -95,7 +95,7 @@
                     <div class="site-heading">
                         <h1>TigerTalk</h1>
                         <hr class="small">
-                        <span class="subheading">Let's Chat</span>
+                        <span class="subheading">Let's Chat.</span>
                     </div>
                 </div>
             </div>
@@ -118,9 +118,9 @@
                     </a>
                     <h3 class="post-subtitle">
                     {% for tag in question.tags.all %}
-                    <a href="{% url 'blog:filtertag' tag.text %}">
-                       {{tag.text}}
-                    </a>
+                        <a href="{% url 'blog:filtertag' tag.text %}">
+                           {{tag.text}}
+                        </a>
                     {% endfor %}
                     </h3>
                     <h3 class="post-subtitle"> 
@@ -182,7 +182,7 @@
                             <a href="{% url 'blog:mod' %}"> mod page </a>
                         {% endif %}
                         {% if user.is_authenticated and user.profile.is_admin %}
-                            3<a href="{% url 'blog:admin' %}"> admin page </a>
+                            <a href="{% url 'blog:admin' %}"> admin page </a>
                         {% endif %}
 
                         </li>

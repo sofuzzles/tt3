@@ -24,6 +24,9 @@ h6 {
   font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 800;
 }
+a[class=inimage] {
+  color: #FFFFFF;
+}
 a {
   color: #333333;
 }
@@ -31,14 +34,52 @@ a:hover,
 a:focus {
   color: #0085A1;
 }
+a[class=tag] {
+  color: #FFFFFF;
+}
 a img:hover,
 a img:focus {
   cursor: zoom-in;
+}
+i[class=usersays] {
+  color: #AAAAAA;
+}
+p[class=postedat] {
+  color: #E0E0E0;
 }
 blockquote {
   color: #777777;
   font-style: italic;
 }
+
+#outer
+{
+    width:100%;
+    text-align: left;
+}
+.inner
+{
+    display: inline-block;
+}
+
+button[class=resbtn] {
+    color: #000000;
+    font-size: xx-small;
+    background-color: rgba(170, 170, 170, 0.39);
+}
+
+button[class=headerbtn] {
+    color: #FFFFFF;
+    font-size: small;
+    background-color: rgba(170, 170, 170, 0.39);
+}
+
+input[class=headerbtn] {
+    color: #FFFFFF;
+    font-size: small;
+    background-color: rgba(170, 170, 170, 0.39);
+}
+
 hr.small {
   max-width: 100px;
   margin: 15px auto;
@@ -416,15 +457,10 @@ input[type=submit]{
   font-weight: 800;
   letter-spacing: 1px;
   padding: 15px 25px;
-  background-color: white;
   border-radius: 0;
   border-style: 1px solid;
-}
-input[type=submit]:hover,
-input[type=submit]:focus {
   color: white;
-  background-color: #ffb74d;
-  border: 1px solid #ffb74d;
+  background-color: rgba(170, 170, 170, 0.39);;
 }
 
 search_link 
