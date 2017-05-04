@@ -48,7 +48,7 @@
                 
                 <ul class="nav navbar-nav navbar-left">
                 <li>
-                    <a href="index.html">
+                     <a href="{% url 'blog:editprofile' %}">
                     {% if user.is_authenticated %}
                         Currently logged in as {{user.profile.handle}}. </a>
                         <li>
@@ -132,7 +132,7 @@
                               var hid1 = document.createElement("input");
                               hid1.setAttribute("type", "hidden");
                               hid1.setAttribute("name", "question_id")
-                              hid1.setAttribute("name", "{{question.id}}")
+                              hid1.setAttribute("value", "{{question.id}}")
                               btn.parentNode.insertBefore(hid1, btn); 
 
                               var hid2 = document.createElement("input");
@@ -254,18 +254,5 @@
 <ul>
 
 </ul>
-<!-- {% if user.is_authenticated and not user.profile.blockedOrNot %}
-<form method="post" action="{% url 'blog:update_responses' %}#resp_results{{question.id}}">
-{% csrf_token %}
-<textarea type="text" name="response" rows="7" style="width:100%" placeholder="Enter a response..."></textarea>
-<input type="hidden" name="question_id" value="{{question.id}}">
-<input type="submit" value="Submit">
-<input type="hidden" name="user_id" value="{{user.id}}">
-<input type="hidden" name="page" value="{{page_number}}">
-</form>
-{% else %}
-<form action="{% url 'blog:loginpage' %}" method="get">
-<button name="login" value="{{question.id}}">Please Login to Answer a Question</button>
-</form>
-{% endif %} -->
+
 

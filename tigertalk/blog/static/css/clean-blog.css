@@ -24,6 +24,9 @@ h6 {
   font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 800;
 }
+textarea{
+  color:black;
+}
 a[class=inimage] {
   color: #FFFFFF;
 }
@@ -462,5 +465,6 @@ input[type=submit]{
   color: white;
   background-color: rgba(170, 170, 170, 0.39);;
 }
+
 
 search_link 

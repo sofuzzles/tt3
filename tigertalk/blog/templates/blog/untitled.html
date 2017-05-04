@@ -10,7 +10,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>TigerTalk</title>
+    <title>Tiger Talk</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
@@ -51,7 +51,7 @@
                 
                 <ul class="nav navbar-nav navbar-left">
                 <li>
-                    <a href="{% url 'blog:editprofile' %}">
+                    <a href="index.html">
                     {% if user.is_authenticated %}
                         Currently logged in as {{user.profile.handle}}. </a>
                         <li>
@@ -88,14 +88,14 @@
 
     <!-- Page Header -->
     <!-- Set your background image for this header on the line below. -->
-    <header class="intro-header" style="background-image: url('{% static "img/index.jpg"%}')">
+    <header class="intro-header" style="background-image: url('{% static "img/home-bg.jpg"%}')">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                     <div class="site-heading">
                         <h1>TigerTalk</h1>
                         <hr class="small">
-                        <span class="subheading">Let's Chat.</span>
+                        <span class="subheading">Login!</span>
                     </div>
                 </div>
             </div>
@@ -108,53 +108,42 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-                {% for question in questions %}
-                {% show_current_number as page_number %}
                 <div class="post-preview">
-                    <a href="{% url 'blog:questions' question.id %}">
+                 {% if user.is_authenticated %}
+                     {% if user.profile.initialized %}
+                        {% if user.profile.blockedOrNot %}
                         <h2 class="post-title">
-                            {{ question.text|truncatechars:200 }}
+                            Your account is blocked. Please contact a moderator at princetontigertalk@gmail.com if you think this is an error. 
                         </h2>
-                    </a>
-                    <h3 class="post-subtitle">
-                    {% for tag in question.tags.all %}
-                        <a href="{% url 'blog:filtertag' tag.text %}">
-                           {{tag.text}}
-                        </a>
-                    {% endfor %}
-                    </h3>
-                    <h3 class="post-subtitle"> 
-                            {{question.top_answers.0.text}}
-                        
-                    </h3>
-                    </div>
-                    <ul class="pager">
-                    <li class="pull-left">
-                        {% if user.is_authenticated and not user.profile.blockedOrNot %}
-                            {% if question in flagged_question_list %}
-                                    <form action="{% url 'blog:index' %}" method="post">
-                                        {% csrf_token %}
+                        <li class="next">
+                            <a href="/accounts/logout">Log out</a>
+                         </li>
+                        {% else %}
+                            <h1> Thanks for Logging in! </h1>
+                            <form action="{% url 'blog:index' %}" method="get">              
+                            <button name="home" value="">Return to Home Page</button>              
+                        </form>
+                        {% endif %}
+                    {% else %}
+                    <h2 class="post-title">
+                    First time logging in?
+                    </h2>
+                    <form action="{% url 'blog:createprofile' %}" method="get">
+                    <button name="home" value="">Please create your profile</button>
+                    </form>
 
-                                        <button name="unflag_q" value="{{question.id}}">Un-flag this question as inappropriate</button>
-                                        <input type="hidden" name="user_id" value="{{user.id}}">
-                                        <input type="hidden" name="page" value="{{page_number}}">
-                                    </form>
-                            {% else %}
-                                <form action="{% url 'blog:index' %}" method="post">
-                                {% csrf_token %}
-                                <button name="flag_q" value="{{question.id}}">Flag this question as inappropriate</button>
-                                <input type="hidden" name="user_id" value="{{user.id}}">
-                                <input type="hidden" name="page" value="{{page_number}}">
-                                </form>
-                            {% endif %}
-                        {% endif %} 
-                     </ul>
-                     </li>
+                    {% endif %}
+                    {% else %}
+                        <li class="next">
+                         <a href="/accounts/login">Log in!</a>
+                         </li>
+                    {% endif %}
+
     
                     <!-- Pager -->
                 <ul class="pager">
                     <li class="next">
-                        <a href="{% url 'blog:questions' question.id %}">See more/Respond&rarr;</a>
+                        <a href="{% url 'blog:questions' question.id %}">See more/Respond&rarr;>
                     </li>
                 </ul>
                 <hr>
@@ -182,7 +171,7 @@
                             <a href="{% url 'blog:mod' %}"> mod page </a>
                         {% endif %}
                         {% if user.is_authenticated and user.profile.is_admin %}
-                            <a href="{% url 'blog:admin' %}"> admin page </a>
+                            3<a href="{% url 'blog:admin' %}"> admin page </a>
                         {% endif %}
 
                         </li>
